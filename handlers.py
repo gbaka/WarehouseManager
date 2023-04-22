@@ -1,8 +1,24 @@
 import telebot
 import config
+import utils
 
 if __name__ == "handlers":
 	bot = telebot.TeleBot(token=config.TOKEN)
+
+
+@bot.message_handler(commands=['start'])
+def start(message):
+	"""
+	Обрабатывает команду пользователя на добавление товара
+	"""
+	mes = bot.send_message(chat_id=message.chat.id, text=config.start_message)
+	bot.register_next_step_handler(mes, check_login)
+
+	pass
+
+def check_login(message):
+	pass
+
 
 
 @bot.message_handler(commands=['add'])
