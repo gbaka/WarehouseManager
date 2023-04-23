@@ -1,3 +1,2 @@
-2023-04-23 04:31:25,227 INFO bot is running
-2023-04-23 04:32:39,665 ERROR Infinity polling: polling exited
-2023-04-23 04:32:39,665 ERROR Break infinity polling
+2023-04-24 02:09:33,201 INFO database is open
+2023-04-24 02:09:33,202 INFO bot is running

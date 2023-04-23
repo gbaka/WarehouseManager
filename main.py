@@ -1,9 +1,5 @@
-import telebot
-import config
-import sqlite3
 from handlers.comand_handlers import *
 from utils.database_manager import *
-
 
 
 def main():
