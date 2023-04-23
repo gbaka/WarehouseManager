@@ -21,7 +21,7 @@ class DatabaseManager:
             self.cursor.execute("CREATE TABLE IF NOT EXISTS `goods`(`id` INT, `name` TEXT, `amount` INT, `cost` INT)")
         self.cursor.execute("SELECT max(`id`) FROM `goods`")
         found = self.cursor.fetchone()
-        self.next_product_id = (0 if len(found) == 0 else found[0]) + 1
+        self.next_product_id = (0 if len(found) == 0 else found[0] + 1)
         if "codes" not in tables_list:
             self.cursor.execute("CREATE TABLE IF NOT EXISTS `codes` (`code` TEXT, `role` BOOLEAN)")
             self.cursor.execute("INSERT INTO `codes` VALUES(?, ?)",
