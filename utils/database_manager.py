@@ -1,6 +1,7 @@
 import sqlite3
 import config
 import logging
+import math
 
 logging.basicConfig(level=logging.INFO, filename="logs.txt", filemode="w",
                     format="%(asctime)s %(levelname)s %(message)s")
@@ -18,9 +19,11 @@ class DatabaseManager:
         tables_list = list(map(lambda tuple_obj: tuple_obj[0], self.cursor.fetchall()))
         if "goods" not in tables_list:
             self.cursor.execute("CREATE TABLE IF NOT EXISTS `goods`(`id` INT, `name` TEXT, `amount` INT, `cost` INT)")
-        self.cursor.execute("SELECT max(`id`) FROM `goods`")
+        self.cursor.execute("SELECT max(`id`), count(`id`) FROM `goods`")
         found = self.cursor.fetchone()
         self.next_product_id = (1 if found[0] is None else int(found[0]) + 1)
+        self.amount_goods = found[1]
+
         if "codes" not in tables_list:
             self.cursor.execute("CREATE TABLE IF NOT EXISTS `codes` (`code` TEXT, `role` BOOLEAN)")
             self.cursor.execute("INSERT INTO `codes` VALUES(?, ?)",
@@ -85,12 +88,15 @@ class DatabaseManager:
         self.connection.commit()
         return self.__get_product(_id)
 
-    # def __is_exist(self, _id):
-    #     """Возвращает True, если в базе есть товар с указанным id"""
-    #     self.cursor.execute("SELECT `id` FROM `goods` WHERE `id` = ",
-    #                         (_id,))
-    #     found = self.cursor.fetchone()
-    #     return len(found) != 0
+    def get_catalog_page(self, page):
+        """Возвращает запрашиваемую страницу из каталога (количество страниц в каталоге определяется в config)
+                Если страницы в каталоге нет возвращается False"""
+        self.cursor.execute("SELECT `id`, `name`, `amount`, `cost` FROM `goods` LIMIT ? OFFSET ?",
+                            (config.catalog_offset, (page-1)*config.catalog_offset))
+        found = self.cursor.fetchall()
+        if len(found) == 0:
+            return False
+        return found
     
     def __get_product(self, _id):
         """Возвращает запись о продукте из БД, если продукта с указанным ID нет - вернет False"""
@@ -104,6 +110,9 @@ class DatabaseManager:
 
     def get_next_product_id(self):
         return self.next_product_id
+
+    def get_amount_pages(self):
+        return math.ceil(self.amount_goods/config.catalog_offset)
 
     def close(self):
         self.connection.close()
