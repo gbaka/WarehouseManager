@@ -18,7 +18,9 @@ class DatabaseManager:
         self.cursor.execute("SELECT `name` FROM sqlite_master WHERE type='table'")
         tables_list = list(map(lambda tuple_obj: tuple_obj[0], self.cursor.fetchall()))
         if "goods" not in tables_list:
-            self.cursor.execute("CREATE TABLE IF NOT EXISTS `goods`(`id` INT, `name` TEXT, `amount` INT, `cost` INT)")
+            self.cursor.execute("CREATE TABLE IF NOT EXISTS `goods`"
+                                "(`id` INT, `name` TEXT, `amount` INT, `s_price` INT, `p_price` INT)")
+
         self.cursor.execute("SELECT max(`id`), count(`id`) FROM `goods`")
         found = self.cursor.fetchone()
         self.next_product_id = (1 if found[0] is None else int(found[0]) + 1)
@@ -41,7 +43,7 @@ class DatabaseManager:
             return 0
         return res[1]
 
-    def add_product(self, name, amount, cost):
+    def add_product(self, name, amount, s_price, p_price):
         """Если продукт с таким именем уже есть - добавления не происходит и возвращается id продукта
                    иначе происходит добавление продукта и возвращается False"""
         self.cursor.execute("SELECT `id` FROM `goods` WHERE `name` = ?",
@@ -49,10 +51,11 @@ class DatabaseManager:
         found = self.cursor.fetchone()
         if found is not None:
             return found[0]
-        self.cursor.execute("INSERT INTO `goods` VALUES(?, ?, ?, ?)",
-                            (self.next_product_id, name, amount, cost))
+        self.cursor.execute("INSERT INTO `goods` VALUES(?, ?, ?, ?, ?)",
+                            (self.next_product_id, name, amount, s_price, p_price))
         self.connection.commit()
         self.next_product_id += 1
+        self.amount_goods += 1
         return False
 
 
@@ -66,18 +69,33 @@ class DatabaseManager:
         self.cursor.execute("DELETE FROM `goods` WHERE `id` = ?",
                             (_id,))
         self.connection.commit()
+        self.amount_goods -= 1
         return found
 
-    def setv(self, _id, value):
-        """Если продукта с таким id нет - изменить стоимость невозможно и возвращаем False,
+    # set sell price
+    def setsp(self, _id, value):
+        """Если продукта с таким id нет - изменить стоимость продажи невозможно и возвращаем False,
                  в противном случае возвращается запись о продукте (обновленную)"""
         found = self.__get_product(_id)
         if not found:
             return False
-        self.cursor.execute("UPDATE `goods` SET `cost` = ? WHERE `id` = ?", (value, _id))
+        self.cursor.execute("UPDATE `goods` SET `s_price` = ? WHERE `id` = ?", (value, _id))
         self.connection.commit()
         return self.__get_product(_id)
 
+    # set purchase price
+    def setpp(self, _id, value):
+        """Если продукта с таким id нет - изменить стоимость покупки невозможно и возвращаем False,
+                   в противном случае возвращается запись о продукте (обновленную)"""
+        found = self.__get_product(_id)
+        if not found:
+            return False
+        self.cursor.execute("UPDATE `goods` SET `p_price` = ? WHERE `id` = ?", (value, _id))
+        self.connection.commit()
+        return self.__get_product(_id)
+
+
+    # set amount
     def seta(self, _id, amount):
         """Если продукта с таким id нет - изменить количество невозможно и возвращаем False,
                          в противном случае возвращается запись о продукте (обновленную)"""
@@ -91,7 +109,7 @@ class DatabaseManager:
     def get_catalog_page(self, page):
         """Возвращает запрашиваемую страницу из каталога (количество страниц в каталоге определяется в config)
                 Если страницы в каталоге нет возвращается False"""
-        self.cursor.execute("SELECT `id`, `name`, `amount`, `cost` FROM `goods` LIMIT ? OFFSET ?",
+        self.cursor.execute("SELECT * FROM `goods` LIMIT ? OFFSET ?",
                             (config.catalog_offset, (page-1)*config.catalog_offset))
         found = self.cursor.fetchall()
         if len(found) == 0:
@@ -100,7 +118,7 @@ class DatabaseManager:
     
     def __get_product(self, _id):
         """Возвращает запись о продукте из БД, если продукта с указанным ID нет - вернет False"""
-        self.cursor.execute("SELECT `id`, `name`, `amount`, `cost` FROM `goods` WHERE `id` = ? ",
+        self.cursor.execute("SELECT * FROM `goods` WHERE `id` = ? ",
                             (_id,))
         found = self.cursor.fetchone()
         if found is not None:
@@ -113,6 +131,9 @@ class DatabaseManager:
 
     def get_amount_pages(self):
         return math.ceil(self.amount_goods/config.catalog_offset)
+
+    def get_amount_goods(self):
+        return self.amount_goods
 
     def close(self):
         self.connection.close()

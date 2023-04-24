@@ -20,3 +20,9 @@ class AccountManager:
         access_level = self.get_access_level(user_id)
         if access_level != 0:
             self.authorized[access_level].remove(user_id)
+
+    def is_admin(self, user_id):
+        return user_id in self.authorized[2]
+
+    def check_access(self, user_id, required_access):
+        return self.get_access_level(user_id) >= required_access

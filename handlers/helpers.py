@@ -1,37 +1,40 @@
 from telebot import types
-from utils.account_manager import AccountManager
 import re
+import config
 
-ACCOUNT_MANAGER = AccountManager()
-
-
-def check_access(user_id, required_access):
-    print(user_id)
-    return ACCOUNT_MANAGER.get_access_level(user_id) >= required_access
 
 
 def is_valid(command_string, template):
     """Проверяет, соответствует ли данная строка regex шаблону.
        Если да - возвращает разбиение строки, иначе False"""
     command_string = command_string.strip()
-    print(command_string)
     check = re.search(template, command_string)
-    print(check)
-
     if check is None:
         return False
     return check[0].split()
 
 
-def create_catalog_page(catalog_page: str, page: int) -> str:
-    text = f'{page}-ая страница каталога:\n'
+def create_catalog_page(catalog_page: str, page: int, goods_amount: int, for_admin: bool = False) -> str:
+    title = f'📁 *{page}-ая страница каталога:*\n'
+    info = f'_*всего товаров в каталоге: {goods_amount}_\n\n'
+    text = ''
     for record in catalog_page:
-        text += f'ID товара:  {record[0]}\n'
-        text += f'Имя товара: {record[1]}\n'
-        text += f'Количество: {record[2]}\n'
-        text += f'Стоимость:  {record[3]}\n'
+        text += f'_ID товара:_  {record[0]}\n'
+        text += f'_Имя товара:_  "{record[1]}"\n'
+        text += f'_Количество:_ {record[2]}\n'
+        text += f'_\0:_ {record[3]}\n'
+        text += f'_Стоимость покупки:_ {record[4]}\n'
         text += '\n'
-    return text
+    if for_admin:
+        text = text.replace('\0', 'Стоимость продажи')
+        return title + info + text
+    text = text.replace('\0', 'Стоимость')
+    split_text = text.split('\n')
+    del split_text[4::6]
+    return title + info + '\n'.join(split_text)
+
+
+
 
 def create_page_keyboard(page: int, max_page: int):
     if page > max_page or page < 1:
@@ -43,3 +46,18 @@ def create_page_keyboard(page: int, max_page: int):
     markup.add(left, current, right)
     return markup
 
+def create_start_keyboard():
+    markup = types.ReplyKeyboardMarkup()
+    item1 = types.KeyboardButton("Каталог")
+    item2 = types.KeyboardButton("Справка")
+    markup.add(item1, item2)
+    return markup
+
+
+def get_info(user_id, access_level):
+    '''Возвращает текст умной справки
+    (в зависимости от уровня доступа юзера)'''
+    info = config.info['title']
+    for i in range(access_level+1):
+        info += config.info[i]
+    return info
