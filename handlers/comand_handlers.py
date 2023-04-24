@@ -52,7 +52,7 @@ def add_product(message):
         product_id = DATABASE_MANAGER.get_next_product_id() - 1
         BOT.send_message(
             chat_id=message.chat.id,
-            text=f'Товар добавлен в базу данных.\n'
+            text='Товар добавлен в базу данных.\n'
                  f'ID товара:  {product_id}\n'
                  f'Имя товара: {command[1]}\n'
                  f'Количество: {command[2]}\n'
@@ -61,7 +61,7 @@ def add_product(message):
         return
     BOT.send_message(
         chat_id=message.chat.id,
-        text='комманда введена неверно.\n'
+        text='Комманда введена неверно.\n'
              'формат команды: /add <name> <amount> <cost>"'
     )
 
@@ -71,13 +71,31 @@ def add_product(message):
     func=lambda mes: helpers.check_access(mes.from_user.id, config.commands_access['setv'])
 )
 def set_value_of_product(message):
-    """Обрабатывает команду пользователя на изменение цены товара"""
-    if helpers.is_valid(message.text, r"/add\s+.+\s+\d{1,16}\s+\d{1,16}"):
-        BOT.send_message(chat_id=message.chat.id, text='access successful')
+    """Обрабатывает команду пользователя на изменение цены товара
+                  /setv <ID> <new_cost>"""
+    command = helpers.is_valid(message.text, r"/setv\s+\d{1,8}\s+\d{1,16}")
+    if command:
+        status = DATABASE_MANAGER.setv(command[1], command[2])
+        if status:
+            BOT.send_message(
+                chat_id=message.chat.id,
+                text='Цена товара успешно изменена\n'
+                     f'ID товара:  {status[0]}\n'
+                     f'Имя товара: {status[1]}\n'
+                     f'Количество: {status[2]}\n'
+                     f'Стоимость:  {status[3]}\n'
+            )
+            return
+        BOT.send_message(
+            chat_id=message.chat.id,
+            text='Товара с таким ID нет в базе'
+        )
         return
-    BOT.send_message(chat_id=message.chat.id,
-                     text='комманда введена неверно.\n'
-                          'формат команды: /add <name> <amount> <cost>"')
+    BOT.send_message(
+        chat_id=message.chat.id,
+        text='Команда введена неверно.\n'
+             'формат команды: /setv <ID> <new_cost>'
+    )
 
 
 @BOT.message_handler(
@@ -85,8 +103,31 @@ def set_value_of_product(message):
     func=lambda mes: helpers.check_access(mes.from_user.id, config.commands_access['seta'])
 )
 def set_amount_of_product(message):
-    """Обрабатывает команду пользователя на изменение количества товара"""
-    pass
+    """Обрабатывает команду пользователя на изменение количества товара
+                      /seta <ID> <new_amount>"""
+    command = helpers.is_valid(message.text, r"/seta\s+\d{1,8}\s+\d{1,16}")
+    if command:
+        status = DATABASE_MANAGER.seta(command[1], command[2])
+        if status:
+            BOT.send_message(
+                chat_id=message.chat.id,
+                text='Количество товара успешно изменено\n'
+                     f'ID товара:  {status[0]}\n'
+                     f'Имя товара: {status[1]}\n'
+                     f'Количество: {status[2]}\n'
+                     f'Стоимость:  {status[3]}\n'
+            )
+            return
+        BOT.send_message(
+            chat_id=message.chat.id,
+            text='Товара с таким ID нет в базе'
+        )
+        return
+    BOT.send_message(
+        chat_id=message.chat.id,
+        text='Команда введена неверно.\n'
+             'формат команды: /seta <ID> <new_amount>'
+    )
 
 
 @BOT.message_handler(

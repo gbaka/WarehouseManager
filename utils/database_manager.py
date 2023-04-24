@@ -52,31 +52,54 @@ class DatabaseManager:
         self.next_product_id += 1
         return False
 
+
     def del_product(self, _id):
         """Если продукта с таким id нет - удаление невозможно и возвращается False,
-                   иначе происходит удаление и возвращается True"""
+                   иначе происходит удаление и возвращается запись о продукте"""
         # если товара с таким id нет - возвращаем False
-        if not self.__is_exist(_id):
+        found = self.__get_product(_id)
+        if not found:
             return False
         self.cursor.execute("DELETE FROM `goods` WHERE `id` = ?",
                             (_id,))
         self.connection.commit()
-        return True
+        return found
 
     def setv(self, _id, value):
         """Если продукта с таким id нет - изменить стоимость невозможно и возвращаем False,
-                        в противном случае возвращаем True"""
-        if not self.__is_exist(_id):
+                 в противном случае возвращается запись о продукте (обновленную)"""
+        found = self.__get_product(_id)
+        if not found:
             return False
         self.cursor.execute("UPDATE `goods` SET `cost` = ? WHERE `id` = ?", (value, _id))
-        return True
+        self.connection.commit()
+        return self.__get_product(_id)
 
-    def __is_exist(self, _id):
-        """Возвращает True, если в базе есть товар с указанным id"""
-        self.cursor.execute("SELECT `id` FROM `goods` WHERE `id` = ",
+    def seta(self, _id, amount):
+        """Если продукта с таким id нет - изменить количество невозможно и возвращаем False,
+                         в противном случае возвращается запись о продукте (обновленную)"""
+        found = self.__get_product(_id)
+        if not found:
+            return False
+        self.cursor.execute("UPDATE `goods` SET `amount` = ? WHERE `id` = ?", (amount, _id))
+        self.connection.commit()
+        return self.__get_product(_id)
+
+    # def __is_exist(self, _id):
+    #     """Возвращает True, если в базе есть товар с указанным id"""
+    #     self.cursor.execute("SELECT `id` FROM `goods` WHERE `id` = ",
+    #                         (_id,))
+    #     found = self.cursor.fetchone()
+    #     return len(found) != 0
+    
+    def __get_product(self, _id):
+        """Возвращает запись о продукте из БД, если продукта с указанным ID нет - вернет False"""
+        self.cursor.execute("SELECT `id`, `name`, `amount`, `cost` FROM `goods` WHERE `id` = ? ",
                             (_id,))
         found = self.cursor.fetchone()
-        return len(found) != 0
+        if found is not None:
+            return found
+        return False
 
 
     def get_next_product_id(self):
