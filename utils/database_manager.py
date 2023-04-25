@@ -17,25 +17,37 @@ class DatabaseManager:
     def init_database(self):
         self.cursor.execute("SELECT `name` FROM sqlite_master WHERE type='table'")
         tables_list = list(map(lambda tuple_obj: tuple_obj[0], self.cursor.fetchall()))
+
         if "goods" not in tables_list:
-            self.cursor.execute("CREATE TABLE `goods`"
-                                "(`id` INT PRIMARY KEY, `name` TEXT, `amount` INT, `s_price` INT, `p_price` INT)")
+            self.cursor.execute(
+                "CREATE TABLE `goods`"
+                "(`id` INT PRIMARY KEY, `name` TEXT, `amount` INT, `s_price` INT, `p_price` INT)"
+            )
+
+        if "codes" not in tables_list:
+            self.cursor.execute("CREATE TABLE `codes` (`code` TEXT, `role` BOOLEAN)")
+            self.cursor.execute(
+                "INSERT INTO `codes` VALUES(?, ?)",
+                (config.admin_code, 2)
+            )
+            self.cursor.execute(
+                "INSERT INTO `codes` VALUES(?, ?)",
+                (config.employer_code, 1)
+            )
+
+        if "journal" not in tables_list:
+            self.cursor.execute(
+                "CREATE TABLE `journal` (`id` INT PRIMARY KEY, `name` TEXT, `amount_sales` INT, "
+                "`sold_on` INT, `amount_purchases` INT, `purchased_on` INT)"
+            )
 
         self.cursor.execute("SELECT max(`id`), count(`id`) FROM `goods`")
         found = self.cursor.fetchone()
         self.next_product_id = (1 if found[0] is None else int(found[0]) + 1)
         self.amount_goods = found[1]
-
-        if "codes" not in tables_list:
-            self.cursor.execute("CREATE TABLE `codes` (`code` TEXT, `role` BOOLEAN)")
-            self.cursor.execute("INSERT INTO `codes` VALUES(?, ?)",
-                                (config.admin_code, 2))
-            self.cursor.execute("INSERT INTO `codes` VALUES(?, ?)",
-                                (config.employer_code, 1))
-
-        if "journal" not in tables_list:
-            self.cursor.execute("CREATE TABLE `journal` (`id` INT PRIMARY KEY, `amount_sales` INT, `sold_on` INT, "
-                                "`amount_purchases` INT, `purchased_on` INT)")
+        self.cursor.execute("SELECT count(`id`) FROM `journal`")
+        found = self.cursor.fetchone()
+        self.amount_journal_records = found[0]
 
         self.connection.commit()
 
@@ -131,11 +143,17 @@ class DatabaseManager:
     def get_next_product_id(self):
         return self.next_product_id
 
-    def get_amount_pages(self):
+    def get_amount_catalog_pages(self):
         return math.ceil(self.amount_goods / config.catalog_offset)
+
+    def get_amount_journal_pages(self):
+        return math.ceil(self.amount_journal_records / config.journal_offset)
 
     def get_amount_goods(self):
         return self.amount_goods
+
+    def get_amount_journal_records(self):
+        return self.amount_journal_records
 
     def close(self):
         self.connection.close()

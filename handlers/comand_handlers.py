@@ -262,7 +262,7 @@ def show_catalog(message):
         if status:
             BOT.send_message(
                 chat_id=message.chat.id,
-                reply_markup=helpers.create_flip_keyboard(page, DATABASE_MANAGER.get_amount_pages(), 'catalog'),
+                reply_markup=helpers.create_flip_keyboard(page, DATABASE_MANAGER.get_amount_catalog_pages(), 'catalog'),
                 text=helpers.create_catalog_page(
                     status, page, DATABASE_MANAGER.get_amount_goods(),
                     ACCOUNT_MANAGER.is_admin(message.from_user.id)
@@ -290,7 +290,7 @@ def show_catalog(message):
 
 @BOT.message_handler(
     commands=['journal'],
-    func=lambda mes: ACCOUNT_MANAGER.check_access(mes.from_user.id, config.commands_access['catalog'])
+    func=lambda mes: ACCOUNT_MANAGER.check_access(mes.from_user.id, config.commands_access['journal'])
 )
 def show_journal(message):
     """Обрабатывает команду пользователя на отображения страницы журнала продаж и закупок
@@ -300,33 +300,32 @@ def show_journal(message):
         page = 1 if len(command) == 1 else int(command[1])
         page = 1 if page == 0 else page
         ###
-        status = DATABASE_MANAGER.get_catalog_page(page)
+        status = DATABASE_MANAGER.get_journal_page(page)
         if status:
             BOT.send_message(
                 chat_id=message.chat.id,
-                reply_markup=helpers.create_flip_keyboard(page, DATABASE_MANAGER.get_amount_pages(), 'catalog'),
-                text=helpers.create_catalog_page(
-                    status, page, DATABASE_MANAGER.get_amount_goods(),
-                    ACCOUNT_MANAGER.is_admin(message.from_user.id)
+                reply_markup=helpers.create_flip_keyboard(page, DATABASE_MANAGER.get_amount_journal_pages(), 'journal'),
+                text=helpers.create_journal_page(
+                    status, page, DATABASE_MANAGER.get_amount_journal_records()
                 )
             )
             return
         if page == 1:
             BOT.send_message(
                 chat_id=message.chat.id,
-                text='📂 *Каталог пуст*'
+                text='📂 *Журнал учета пуст*'
             )
             return
         BOT.send_message(
             chat_id=message.chat.id,
-            text='⚙️ *Указанной страницы нет в каталоге*'
+            text='⚙️ *Указанной страницы нет в журнале учета*'
         )
         return
     BOT.send_message(
         chat_id=message.chat.id,
         text='❌ *Команда введена неверно*.\n\n'
              'Формат команды:\n'
-             '`/catalog <page=0>`'
+             '`/journal <page=1>`'
     )
 
 
@@ -369,9 +368,9 @@ def flip_page(call):
     command = helpers.is_valid(call.data, r'catalog \d+')
     if command:
         to_page = int(command[1])
-        if 1 <= to_page <= DATABASE_MANAGER.get_amount_pages():
+        max_page = DATABASE_MANAGER.get_amount_catalog_pages()
+        if 1 <= to_page <= max_page:
             page_record = DATABASE_MANAGER.get_catalog_page(to_page)
-            max_page = DATABASE_MANAGER.get_amount_pages()
             BOT.edit_message_text(
                 chat_id=call.message.chat.id,
                 message_id=call.message.id,
