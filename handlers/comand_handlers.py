@@ -151,11 +151,12 @@ def set_price_of_product(message):
             text='⚙️ *Товара с таким ID нет в базе*'
         )
         return
+    command = message.text.split()[0]
     BOT.send_message(
         chat_id=message.chat.id,
         text='❌ *Команда введена неверно.*\n\n'
-             f'Формат команды:'
-             f'`{command[0]} <ID> <price>`'
+             f'Формат команды:\n'
+             f'`{command} <ID> <price>`'
     )
 
 
@@ -335,5 +336,5 @@ def flip_page(call):
                     page_record, to_page, DATABASE_MANAGER.get_amount_goods(),
                     ACCOUNT_MANAGER.is_admin(call.from_user.id)
                 )
-
             )
+    BOT.answer_callback_query(callback_query_id=call.id)
