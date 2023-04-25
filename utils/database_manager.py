@@ -121,6 +121,15 @@ class DatabaseManager:
         self.connection.commit()
         return self.__get_product(_id)
 
+    # JOURNAL
+    def buy_product(self, _id, amount):
+        """Если товара нет в базе - возвращается False"""
+        is_exist = self.__get_product(_id)
+        if not is_exist:
+            return False
+        found = self.get
+
+
     def get_catalog_page(self, page):
         """Возвращает запрашиваемую страницу из каталога (количество страниц в каталоге определяется в config)
                 Если страницы в каталоге нет возвращается False"""
@@ -161,13 +170,25 @@ class DatabaseManager:
 
     # HELPER FUNCTIONS:
     def __get_product(self, _id) -> bool | list:
-        """Возвращает запись о продукте из БД, если продукта с указанным ID нет - вернет False"""
-        self.cursor.execute("SELECT * FROM `goods` WHERE `id` = ? ",
-                            (_id,))
+        """Возвращает запись о продукте из каталога, если продукта с указанным ID нет - вернет False"""
+        self.cursor.execute(
+            "SELECT * FROM `goods` WHERE `id` = ? ",
+            (_id,)
+        )
         found = self.cursor.fetchone()
         if found is not None:
             return found
         return False
+
+    def __get_record(self, _id):
+        """Возвращает запись о продукте из журнала учета, если продукта с указанным ID нет - вернет False"""
+        self.cursor.execute(
+            "SELECT * FROM `journal` WHERE `id` = ?",
+            (_id,)
+        )
+        found = self.cursor.fetchone()
+        if found is not None:
+            return
 
     def __get_product_name(self, _id):
         found = self.__get_product(_id)

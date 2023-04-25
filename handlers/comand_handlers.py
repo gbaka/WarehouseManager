@@ -328,6 +328,16 @@ def show_journal(message):
              '`/journal <page=1>`'
     )
 
+@BOT.message_handler(
+    commands=['buy'],
+    func=lambda mes: ACCOUNT_MANAGER.check_access(mes.from_user.id, config.commands_access['buy'])
+)
+def buy_product(message):
+    command = helpers.is_valid(message.text, r"/buy\s+\d{1,8}\s+d{1,16}(\s+|\$)")
+    if command:
+
+        pass
+
 
 @BOT.message_handler(
     commands=['myrole'],
