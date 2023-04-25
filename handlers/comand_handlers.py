@@ -4,7 +4,7 @@ import handlers.helpers as helpers
 from utils.database_manager import DatabaseManager
 from utils.account_manager import AccountManager
 
-BOT = telebot.TeleBot(token=config.TOKEN,parse_mode='Markdown')
+BOT = telebot.TeleBot(token=config.TOKEN, parse_mode='Markdown')
 DATABASE_MANAGER = DatabaseManager(config.db_name)
 ACCOUNT_MANAGER = AccountManager()
 
@@ -82,6 +82,7 @@ def unauth(message):
         chat_id=message.chat.id,
         text=f'🚪 *Вы успешно вышли из аккаунта*'
     )
+
 
 @BOT.message_handler(
     commands=['add'],
@@ -236,7 +237,7 @@ def del_product(message):
 
 @BOT.message_handler(
     commands=['info'],
-func=lambda mes: ACCOUNT_MANAGER.check_access(mes.from_user.id, config.commands_access['info'])
+    func=lambda mes: ACCOUNT_MANAGER.check_access(mes.from_user.id, config.commands_access['info'])
 )
 def info(message):
     user_id = message.from_user.id
@@ -261,7 +262,7 @@ def show_catalog(message):
         if status:
             BOT.send_message(
                 chat_id=message.chat.id,
-                reply_markup=helpers.create_page_keyboard(page, DATABASE_MANAGER.get_amount_pages()),
+                reply_markup=helpers.create_flip_keyboard(page, DATABASE_MANAGER.get_amount_pages(), 'catalog'),
                 text=helpers.create_catalog_page(
                     status, page, DATABASE_MANAGER.get_amount_goods(),
                     ACCOUNT_MANAGER.is_admin(message.from_user.id)
@@ -285,6 +286,7 @@ def show_catalog(message):
              'Формат команды:\n'
              '`/catalog <page=0>`'
     )
+
 
 @BOT.message_handler(
     commands=['myrole'],
@@ -322,16 +324,16 @@ def keyboard_response(message):
     func=lambda call: ACCOUNT_MANAGER.check_access(call.from_user.id, config.commands_access['catalog'])
 )
 def flip_page(call):
-    command = helpers.is_valid(call.data, r'to page \d+')
+    command = helpers.is_valid(call.data, r'catalog \d+')
     if command:
-        to_page = int(command[2])
+        to_page = int(command[1])
         if 1 <= to_page <= DATABASE_MANAGER.get_amount_pages():
             page_record = DATABASE_MANAGER.get_catalog_page(to_page)
             max_page = DATABASE_MANAGER.get_amount_pages()
             BOT.edit_message_text(
                 chat_id=call.message.chat.id,
                 message_id=call.message.id,
-                reply_markup=helpers.create_page_keyboard(to_page, max_page),
+                reply_markup=helpers.create_flip_keyboard(to_page, max_page, 'catalog'),
                 text=helpers.create_catalog_page(
                     page_record, to_page, DATABASE_MANAGER.get_amount_goods(),
                     ACCOUNT_MANAGER.is_admin(call.from_user.id)

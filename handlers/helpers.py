@@ -33,15 +33,15 @@ def create_catalog_page(catalog_page: str, page: int, goods_amount: int, for_adm
     return title + info + '\n'.join(split_text)
 
 
-def create_page_keyboard(page: int, max_page: int):
-    if page > max_page or page < 1:
-        return False
-    markup = types.InlineKeyboardMarkup()
-    left = types.InlineKeyboardButton('ᐊ', callback_data=f'to page {page - 1}')
-    current = types.InlineKeyboardButton(f"{page}/{max_page}", callback_data='None')
-    right = types.InlineKeyboardButton('ᐊ', callback_data=f'to page {page + 1}')
-    markup.add(left, current, right)
-    return markup
+# def create_page_keyboard(page: int, max_page: int):
+#     if page > max_page or page < 1:
+#         return False
+#     markup = types.InlineKeyboardMarkup()
+#     left = types.InlineKeyboardButton('ᐊ', callback_data=f'to page {page - 1}')
+#     current = types.InlineKeyboardButton(f"{page}/{max_page}", callback_data='None')
+#     right = types.InlineKeyboardButton('ᐊ', callback_data=f'to page {page + 1}')
+#     markup.add(left, current, right)
+#     return markup
 
 
 def create_flip_keyboard(page: int, max_page: int, callback_label: str):
@@ -50,7 +50,7 @@ def create_flip_keyboard(page: int, max_page: int, callback_label: str):
     markup = types.InlineKeyboardMarkup()
     left = types.InlineKeyboardButton('ᐊ', callback_data=f'{callback_label} {page - 1}')
     current = types.InlineKeyboardButton(f"{page}/{max_page}", callback_data='None')
-    right = types.InlineKeyboardButton('ᐊ', callback_data=f'{callback_label} {page + 1}')
+    right = types.InlineKeyboardButton('ᐅ', callback_data=f'{callback_label} {page + 1}')
     markup.add(left, current, right)
     return markup
 
