@@ -119,6 +119,15 @@ class DatabaseManager:
             return False
         return found
 
+    def get_journal_page(self, page):
+        """None"""
+        self.cursor.execute("SELECT * FROM `journal` LIMIT ? OFFSET ?",
+                            (config.journal_offset, (page - 1) * config.journal_offset))
+        found = self.cursor.fetchall()
+        if len(found) == 0:
+            return False
+        return found
+
     def get_next_product_id(self):
         return self.next_product_id
 

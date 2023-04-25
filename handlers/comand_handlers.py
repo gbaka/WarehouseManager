@@ -289,6 +289,48 @@ def show_catalog(message):
 
 
 @BOT.message_handler(
+    commands=['journal'],
+    func=lambda mes: ACCOUNT_MANAGER.check_access(mes.from_user.id, config.commands_access['catalog'])
+)
+def show_journal(message):
+    """Обрабатывает команду пользователя на отображения страницы журнала продаж и закупок
+               /journal <page=1>"""
+    command = helpers.is_valid(message.text, r"/journal((\s+\d+)|\s*)(\s+|$)")
+    if command:
+        page = 1 if len(command) == 1 else int(command[1])
+        page = 1 if page == 0 else page
+        ###
+        status = DATABASE_MANAGER.get_catalog_page(page)
+        if status:
+            BOT.send_message(
+                chat_id=message.chat.id,
+                reply_markup=helpers.create_flip_keyboard(page, DATABASE_MANAGER.get_amount_pages(), 'catalog'),
+                text=helpers.create_catalog_page(
+                    status, page, DATABASE_MANAGER.get_amount_goods(),
+                    ACCOUNT_MANAGER.is_admin(message.from_user.id)
+                )
+            )
+            return
+        if page == 1:
+            BOT.send_message(
+                chat_id=message.chat.id,
+                text='📂 *Каталог пуст*'
+            )
+            return
+        BOT.send_message(
+            chat_id=message.chat.id,
+            text='⚙️ *Указанной страницы нет в каталоге*'
+        )
+        return
+    BOT.send_message(
+        chat_id=message.chat.id,
+        text='❌ *Команда введена неверно*.\n\n'
+             'Формат команды:\n'
+             '`/catalog <page=0>`'
+    )
+
+
+@BOT.message_handler(
     commands=['myrole'],
     func=lambda call: ACCOUNT_MANAGER.check_access(call.from_user.id, config.commands_access['myrole'])
 )

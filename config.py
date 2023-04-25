@@ -4,6 +4,7 @@ admin_code = "admin"
 employer_code = "employer"
 delay = 0.75
 catalog_offset = 5
+journal_offset = 5
 commands_access = {
     "start":   0,
     "add":     1,
@@ -14,7 +15,8 @@ commands_access = {
     "catalog": 0,
     "auth":    0,
     "unauth":  0,
-    "myrole":  0
+    "myrole":  0,
+    "journal": 2
 }
 
 
