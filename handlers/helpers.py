@@ -40,9 +40,9 @@ def create_page_keyboard(page: int, max_page: int):
     if page > max_page or page < 1:
         return False
     markup = types.InlineKeyboardMarkup()
-    left = types.InlineKeyboardButton('<-',callback_data=f'to page {page-1}')
+    left = types.InlineKeyboardButton('🢠', callback_data=f'to page {page-1}')
     current = types.InlineKeyboardButton(f"{page}/{max_page}", callback_data='None')
-    right = types.InlineKeyboardButton('->', callback_data=f'to page {page+1}')
+    right = types.InlineKeyboardButton('🢡', callback_data=f'to page {page+1}')
     markup.add(left, current, right)
     return markup
 

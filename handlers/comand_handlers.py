@@ -285,6 +285,26 @@ def show_catalog(message):
              '`/catalog <page=0>`'
     )
 
+@BOT.message_handler(
+    commands=['myrole'],
+    func=lambda call: ACCOUNT_MANAGER.check_access(call.from_user.id, config.commands_access['myrole'])
+)
+def get_my_role(message):
+    access_level = ACCOUNT_MANAGER.get_access_level(message.from_user.id)
+    match access_level:
+        case 0:
+            role = "Пользователь"
+        case 1:
+            role = "Работник"
+        case 2:
+            role = "Администратор"
+        case _:
+            role = "Unknown"
+    BOT.send_message(
+        chat_id=message.chat.id,
+        text=f"⚙️ Ваша роль: *{role}*"
+    )
+
 
 @BOT.message_handler(
     content_types=['text']

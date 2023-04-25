@@ -1,2 +1,2 @@
-2023-04-25 02:16:04,888 INFO database is open
-2023-04-25 02:16:04,890 INFO bot is running
+2023-04-25 19:32:50,997 INFO database is open
+2023-04-25 19:32:50,999 INFO bot is running
