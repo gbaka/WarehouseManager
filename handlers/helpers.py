@@ -3,7 +3,6 @@ import re
 import config
 
 
-
 def is_valid(command_string, template):
     """Проверяет, соответствует ли данная строка regex шаблону.
        Если да - возвращает разбиение строки, иначе False"""
@@ -34,28 +33,27 @@ def create_catalog_page(catalog_page: str, page: int, goods_amount: int, for_adm
     return title + info + '\n'.join(split_text)
 
 
-
-
 def create_page_keyboard(page: int, max_page: int):
     if page > max_page or page < 1:
         return False
     markup = types.InlineKeyboardMarkup()
-    left = types.InlineKeyboardButton('ᐊ', callback_data=f'to page {page-1}')
+    left = types.InlineKeyboardButton('ᐊ', callback_data=f'to page {page - 1}')
     current = types.InlineKeyboardButton(f"{page}/{max_page}", callback_data='None')
-    right = types.InlineKeyboardButton('ᐅ', callback_data=f'to page {page+1}')
+    right = types.InlineKeyboardButton('ᐊ', callback_data=f'to page {page + 1}')
     markup.add(left, current, right)
     return markup
 
 
-def create_flip_keyboard(page : int, max_page : int, callback_label : str):
+def create_flip_keyboard(page: int, max_page: int, callback_label: str):
     if page > max_page or page < 1:
         return False
     markup = types.InlineKeyboardMarkup()
-    left = types.InlineKeyboardButton('🢠', callback_data=f'to page {page-1}')
+    left = types.InlineKeyboardButton('ᐊ', callback_data=f'{callback_label} {page - 1}')
     current = types.InlineKeyboardButton(f"{page}/{max_page}", callback_data='None')
-    right = types.InlineKeyboardButton('🢡', callback_data=f'to page {page+1}')
+    right = types.InlineKeyboardButton('ᐊ', callback_data=f'{callback_label} {page + 1}')
     markup.add(left, current, right)
     return markup
+
 
 def create_start_keyboard():
     markup = types.ReplyKeyboardMarkup()
@@ -69,6 +67,6 @@ def get_info(user_id, access_level):
     '''Возвращает текст умной справки
     (в зависимости от уровня доступа юзера)'''
     info = config.info['title']
-    for i in range(access_level+1):
+    for i in range(access_level + 1):
         info += config.info[i]
     return info
