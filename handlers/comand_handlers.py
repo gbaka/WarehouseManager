@@ -255,7 +255,7 @@ def show_product_info(message):
                             f"_Прибыль:_  {income - expense}\n"
             name = helpers.to_markdown_correct(name)
             sub_title = f'_ID товара:_  {_id}\n' \
-                        f'_Имя товара:_  {name}\n\n'
+                        f'_Имя товара:_  "{name}"\n\n'
             text = title + sub_title + '\n'.join(part_1) + '\n'.join(part_2)
             print(_id)
             BOT.send_message(
