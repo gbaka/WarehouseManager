@@ -640,7 +640,7 @@ def handle_button_sell(message, _id):
                     chat_id=message.chat.id,
                     text=f'✅ *Вы успешно продали {amount} единиц\(ы\) товара "{status[1]}":*\n\n'
                          f'_ID товара:_  {status[0]}\n'
-                         f'_Имя товара:_  "{helpers.to_markdown_correct(status[1])}"\n'
+                         f'_Имя товара:_  "{helpers.to_markdown_correct(status[1], 2)}"\n'
                          f'_Стоимость продажи товара:_  {status[3]}\n'
                          f'_Продано штук:_  {amount}\n'
                          f'_*Доход от продажи:*_  *{sell_price * amount}*\n',
@@ -664,7 +664,7 @@ def handle_button_buy(message, _id):
                 chat_id=message.chat.id,
                 text=f'✅ *Вы успешно закупили {amount} единиц товара "{status[1]}":*\n\n'
                      f'_ID товара:_  {status[0]}\n'
-                     f'_Имя товара:_  "{helpers.to_markdown_correct(status[1])}"\n'
+                     f'_Имя товара:_  "{helpers.to_markdown_correct(status[1],2)}"\n'
                      f'_Стоимость закупки товара:_  {status[4]}\n'
                      f'_Закуплено штук:_  {amount}\n'
                      f'_*Расход на закупку:*_  *{purchase_price * amount}*\n',

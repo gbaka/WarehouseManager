@@ -22,7 +22,7 @@ def create_catalog_page(catalog_page: list, page: int, goods_amount: int, for_ad
     text = ''
     for record in catalog_page:
         text += f'_ID товара:_  {record[0]}\n'
-        text += f'_Имя товара:_  "{record[1]}"\n'
+        text += f'_Имя товара:_  "{to_markdown_correct(record[1])}"\n'
         text += f'_Количество:_ {record[2]}\n'
         text += f'_\0:_ {record[3]}\n'
         text += f'_Стоимость покупки:_ {record[4]}\n'
@@ -42,7 +42,7 @@ def create_journal_page(journal_page: list, page: int, records_amount: int) -> s
     text = ''
     for record in journal_page:
         text += f'_ID товара:_  {record[0]}\n'
-        text += f'_Имя товара:_  "{record[1]}"\n'
+        text += f'_Имя товара:_  "{to_markdown_correct(record[1], 2)}"\n'
         text += f'_Количество продаж:_  {record[2]}\n'
         text += f'_Количество закупок:_  {record[4]}\n'
         text += f'_Доход от продаж:_  {record[3]}\n'
@@ -82,11 +82,14 @@ def create_action_keyboar(callback_data):
     return markup
 
 
-def to_markdown_correct(string):
+def to_markdown_correct(string, markdown_v = 1):
     string = string.replace('_', '\_')
     string = string.replace('*', '\*')
     string = string.replace('~', '\~')
     string = string.replace('`', '\`')
+    if markdown_v == 2:
+        string = string.replace('.', '\.')
+        string = string.replace('-', '\-')
     return string
 
 
