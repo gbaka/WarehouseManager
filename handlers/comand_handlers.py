@@ -89,7 +89,7 @@ def unauth(message):
 def add_product(message):
     """Обрабатывает команду пользователя на добавление товара
                 /add <name> <amount> <sell_price> <purchase_price>"""
-    command = helpers.is_valid(message.text, r"/add\s+.+\s+\d{1,16}\s+\d{1,16}\s+\d{1,16}(\s+|$)")
+    command = helpers.is_valid(message.text, r"/add\s+\S+\s+\d{1,16}\s+\d{1,16}\s+\d{1,16}(\s+|$)")
     if command:
         status = DATABASE_MANAGER.add_product(command[1], command[2], command[3], command[4])
         if status:

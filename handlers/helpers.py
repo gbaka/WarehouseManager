@@ -3,14 +3,20 @@ import re
 import config
 
 
-def is_valid(command_string, template):
+def is_valid(command_string, template, parse_markdown=True):
     """Проверяет, соответствует ли данная строка regex шаблону.
        Если да - возвращает разбиение строки, иначе False"""
     command_string = command_string.strip()
     check = re.search(template, command_string)
     if check is None:
         return False
-    return check[0].split()
+    command = check[0]
+    if parse_markdown:
+        command = command.replace('_', '\_')
+        command = command.replace('*', '\*')
+        command = command.replace('~', '\~')
+        command = command.replace('`', '\`')
+    return command.split()
 
 
 def create_catalog_page(catalog_page: list, page: int, goods_amount: int, for_admin: bool = False) -> str:
@@ -50,17 +56,6 @@ def create_journal_page(journal_page: list, page: int, records_amount: int) -> s
         text += '\n'
     return title + info + text
 
-
-
-# def create_page_keyboard(page: int, max_page: int):
-#     if page > max_page or page < 1:
-#         return False
-#     markup = types.InlineKeyboardMarkup()
-#     left = types.InlineKeyboardButton('ᐊ', callback_data=f'to page {page - 1}')
-#     current = types.InlineKeyboardButton(f"{page}/{max_page}", callback_data='None')
-#     right = types.InlineKeyboardButton('ᐊ', callback_data=f'to page {page + 1}')
-#     markup.add(left, current, right)
-#     return markup
 
 
 def create_flip_keyboard(page: int, max_page: int, callback_label: str):
