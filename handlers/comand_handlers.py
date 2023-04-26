@@ -341,7 +341,6 @@ def show_journal(message):
     if command:
         page = 1 if len(command) == 1 else int(command[1])
         page = 1 if page == 0 else page
-        ###
         status = DATABASE_MANAGER.get_journal_page(page)
         if status:
             BOT.send_message(
@@ -523,7 +522,6 @@ def profit(message):
     func=lambda call: ACCOUNT_MANAGER.check_access(call.from_user.id, config.commands_access['profit'])
 )
 def add_expense(message):
-
     command = helpers.is_valid(message.text, r"/addpo\s+\d{1,8}\s+\d{1,16}(\s+|$)")
     if command:
         record = DATABASE_MANAGER.get_record(command[1])
@@ -607,7 +605,6 @@ def keyboard_response(message):
     func=lambda call: True
 )
 def callback_handler(call):
-    command = helpers.is_valid(call.data, r'[A-Za-z]+((\s+\d+)|s*)')
     command = call.data.split()
     print(command)
     user_id = call.from_user.id
