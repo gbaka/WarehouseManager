@@ -394,7 +394,7 @@ def sell_product(message):
 
 
 @BOT.message_handler(
-    commands=['setas', 'setso', 'setap','setpo'],
+    commands=['setas', 'setso', 'setap', 'setpo'],
     func=lambda mes: ACCOUNT_MANAGER.check_access(mes.from_user.id, config.commands_access['setj'])
 )
 def set_journal(message):
@@ -447,9 +447,6 @@ def set_journal(message):
     )
 
 
-
-
-
 @BOT.message_handler(
     commands=['profit'],
     func=lambda call: ACCOUNT_MANAGER.check_access(call.from_user.id, config.commands_access['profit'])
@@ -466,7 +463,6 @@ def profit(message):
     )
 
 
-
 @BOT.message_handler(
     commands=['clearj'],
     func=lambda call: ACCOUNT_MANAGER.check_access(call.from_user.id, config.commands_access['clearj'])
@@ -477,6 +473,7 @@ def clear_journal(message):
         chat_id=message.chat.id,
         text="🗑️ *Журнал учета был успешно очищен*"
     )
+
 
 @BOT.message_handler(
     commands=['myrole'],
@@ -497,8 +494,6 @@ def get_my_role(message):
         chat_id=message.chat.id,
         text=f"⚙️ Ваша роль: *{role}*"
     )
-
-
 
 
 @BOT.message_handler(

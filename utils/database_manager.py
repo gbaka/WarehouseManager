@@ -48,13 +48,14 @@ class DatabaseManager:
         self.cursor.execute("SELECT count(`id`) FROM `journal`")
         found = self.cursor.fetchone()
         self.amount_journal_records = found[0]
-
         self.connection.commit()
 
     def check_auth(self, code):
         code = code.strip()
-        self.cursor.execute("SELECT `code`, `role` FROM `codes` WHERE `code` = ?",
-                            (code,))
+        self.cursor.execute(
+            "SELECT `code`, `role` FROM `codes` WHERE `code` = ?",
+            (code,)
+        )
         res = self.cursor.fetchone()
         if res is None:
             return 0
@@ -63,13 +64,14 @@ class DatabaseManager:
     def add_product(self, name, amount, s_price, p_price):
         """Если продукт с таким именем уже есть - добавления не происходит и возвращается id продукта
                    иначе происходит добавление продукта и возвращается False"""
-        self.cursor.execute("SELECT `id` FROM `goods` WHERE `name` = ?",
-                            (name,))
+        self.cursor.execute("SELECT `id` FROM `goods` WHERE `name` = ?", (name,))
         found = self.cursor.fetchone()
         if found is not None:
             return found[0]
-        self.cursor.execute("INSERT INTO `goods` VALUES(?, ?, ?, ?, ?)",
-                            (self.next_product_id, name, amount, s_price, p_price))
+        self.cursor.execute(
+            "INSERT INTO `goods` VALUES(?, ?, ?, ?, ?)",
+            (self.next_product_id, name, amount, s_price, p_price)
+        )
         self.connection.commit()
         self.next_product_id += 1
         self.amount_goods += 1
@@ -82,8 +84,7 @@ class DatabaseManager:
         found = self.__get_product(_id)
         if not found:
             return False
-        self.cursor.execute("DELETE FROM `goods` WHERE `id` = ?",
-                            (_id,))
+        self.cursor.execute("DELETE FROM `goods` WHERE `id` = ?", (_id,))
         self.connection.commit()
         self.amount_goods -= 1
         return found
@@ -237,8 +238,10 @@ class DatabaseManager:
     def get_catalog_page(self, page):
         """Возвращает запрашиваемую страницу из каталога (количество страниц в каталоге определяется в config)
                 Если страницы в каталоге нет возвращается False"""
-        self.cursor.execute("SELECT * FROM `goods` LIMIT ? OFFSET ?",
-                            (config.catalog_offset, (page - 1) * config.catalog_offset))
+        self.cursor.execute(
+            "SELECT * FROM `goods` LIMIT ? OFFSET ?",
+            (config.catalog_offset, (page - 1) * config.catalog_offset)
+        )
         found = self.cursor.fetchall()
         if len(found) == 0:
             return False

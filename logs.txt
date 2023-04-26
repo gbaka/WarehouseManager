@@ -1,2 +1,46 @@
-2023-04-26 07:26:57,618 INFO database is open
-2023-04-26 07:26:57,620 INFO bot is running
+2023-04-26 07:48:41,969 INFO database is open
+2023-04-26 07:48:41,970 INFO bot is running
+2023-04-26 07:55:21,804 ERROR Infinity polling exception: 'bool' object is not subscriptable
+2023-04-26 07:55:21,805 ERROR Exception traceback:
+Traceback (most recent call last):
+  File "C:\Users\User\PycharmProjects\WarehouseManager\venv\lib\site-packages\telebot\__init__.py", line 955, in infinity_polling
+    self.polling(non_stop=True, timeout=timeout, long_polling_timeout=long_polling_timeout,
+  File "C:\Users\User\PycharmProjects\WarehouseManager\venv\lib\site-packages\telebot\__init__.py", line 1043, in polling
+    self.__threaded_polling(non_stop=non_stop, interval=interval, timeout=timeout, long_polling_timeout=long_polling_timeout,
+  File "C:\Users\User\PycharmProjects\WarehouseManager\venv\lib\site-packages\telebot\__init__.py", line 1118, in __threaded_polling
+    raise e
+  File "C:\Users\User\PycharmProjects\WarehouseManager\venv\lib\site-packages\telebot\__init__.py", line 1074, in __threaded_polling
+    self.worker_pool.raise_exceptions()
+  File "C:\Users\User\PycharmProjects\WarehouseManager\venv\lib\site-packages\telebot\util.py", line 147, in raise_exceptions
+    raise self.exception_info
+  File "C:\Users\User\PycharmProjects\WarehouseManager\venv\lib\site-packages\telebot\util.py", line 90, in run
+    task(*args, **kwargs)
+  File "C:\Users\User\PycharmProjects\WarehouseManager\venv\lib\site-packages\telebot\__init__.py", line 6720, in _run_middlewares_and_handler
+    result = handler['function'](message)
+  File "C:\Users\User\PycharmProjects\WarehouseManager\handlers\comand_handlers.py", line 515, in flip_page
+    to_page = int(command[1])
+TypeError: 'bool' object is not subscriptable
+
+2023-04-26 07:55:25,225 ERROR Threaded polling exception: A request to the Telegram API was unsuccessful. Error code: 400. Description: Bad Request: message is not modified: specified new message content and reply markup are exactly the same as a current content and reply markup of the message
+2023-04-26 07:55:25,232 ERROR Exception traceback:
+Traceback (most recent call last):
+  File "C:\Users\User\PycharmProjects\WarehouseManager\venv\lib\site-packages\telebot\__init__.py", line 1074, in __threaded_polling
+    self.worker_pool.raise_exceptions()
+  File "C:\Users\User\PycharmProjects\WarehouseManager\venv\lib\site-packages\telebot\util.py", line 147, in raise_exceptions
+    raise self.exception_info
+  File "C:\Users\User\PycharmProjects\WarehouseManager\venv\lib\site-packages\telebot\util.py", line 90, in run
+    task(*args, **kwargs)
+  File "C:\Users\User\PycharmProjects\WarehouseManager\venv\lib\site-packages\telebot\__init__.py", line 6720, in _run_middlewares_and_handler
+    result = handler['function'](message)
+  File "C:\Users\User\PycharmProjects\WarehouseManager\handlers\comand_handlers.py", line 521, in flip_page
+    BOT.edit_message_text(
+  File "C:\Users\User\PycharmProjects\WarehouseManager\venv\lib\site-packages\telebot\__init__.py", line 3784, in edit_message_text
+    result = apihelper.edit_message_text(self.token, text, chat_id, message_id, inline_message_id, parse_mode,
+  File "C:\Users\User\PycharmProjects\WarehouseManager\venv\lib\site-packages\telebot\apihelper.py", line 1304, in edit_message_text
+    return _make_request(token, method_url, params=payload, method='post')
+  File "C:\Users\User\PycharmProjects\WarehouseManager\venv\lib\site-packages\telebot\apihelper.py", line 162, in _make_request
+    json_result = _check_result(method_name, result)
+  File "C:\Users\User\PycharmProjects\WarehouseManager\venv\lib\site-packages\telebot\apihelper.py", line 189, in _check_result
+    raise ApiTelegramException(method_name, result, result_json)
+telebot.apihelper.ApiTelegramException: A request to the Telegram API was unsuccessful. Error code: 400. Description: Bad Request: message is not modified: specified new message content and reply markup are exactly the same as a current content and reply markup of the message
+
