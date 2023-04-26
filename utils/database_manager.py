@@ -136,7 +136,6 @@ class DatabaseManager:
             (amount, _id)
         )
 
-
         # добавляем или изменяем запись в журнале учета
         purchase_price = int(is_exist[4])
         amount = int(amount)
@@ -197,6 +196,14 @@ class DatabaseManager:
         self.connection.commit()
         return is_exist
 
+    def calculate_profit(self):
+        select = self.cursor.execute("SELECT SUM(`sold_on`), SUM(`purchased_on`) FROM `journal`")
+        income, expense = list(map(int, select.fetchone()))
+        return income, expense, income - expense
+
+    def clear_journal(self):
+        self.cursor.execute("DELETE FROM `journal`")
+        self.connection.commit()
 
     def get_catalog_page(self, page):
         """Возвращает запрашиваемую страницу из каталога (количество страниц в каталоге определяется в config)

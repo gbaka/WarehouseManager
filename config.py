@@ -18,7 +18,9 @@ commands_access = {
     "myrole":  0,
     "journal": 1,
     "buy":     0,
-    "sell":    0
+    "sell":    0,
+    "profit":  0,
+    "clearj":  0
 }
 
 

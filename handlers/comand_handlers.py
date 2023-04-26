@@ -327,6 +327,7 @@ def show_journal(message):
              '`/journal <page=1>`'
     )
 
+
 @BOT.message_handler(
     commands=['buy'],
     func=lambda mes: ACCOUNT_MANAGER.check_access(mes.from_user.id, config.commands_access['buy'])
@@ -346,7 +347,7 @@ def buy_product(message):
                      f'_Стоимость закупки товара:_  {status[4]}\n'
                      f'_Закуплено штук:_  {command[2]}\n'
                      f'_*Расход на закупку:*_  *{purchase_price * int(command[2])}*\n',
-                parse_mode = 'MarkdownV2'
+                parse_mode='MarkdownV2'
             )
             return
         BOT.send_message(
@@ -405,9 +406,6 @@ def sell_product(message):
     )
 
 
-
-
-
 @BOT.message_handler(
     commands=['myrole'],
     func=lambda call: ACCOUNT_MANAGER.check_access(call.from_user.id, config.commands_access['myrole'])
@@ -427,6 +425,34 @@ def get_my_role(message):
         chat_id=message.chat.id,
         text=f"⚙️ Ваша роль: *{role}*"
     )
+
+
+@BOT.message_handler(
+    commands=['profit'],
+    func=lambda call: ACCOUNT_MANAGER.check_access(call.from_user.id, config.commands_access['profit'])
+)
+def profit(message):
+    income, expense, profit = DATABASE_MANAGER.calculate_profit()
+    BOT.send_message(
+        chat_id=message.chat.id,
+        text="📈 *Данные по выручке:*\n\n"
+             f"_Cуммарный доход:_  {income}\n"
+             f"_Cуммарный расход:_  {expense}\n"
+             f"_Суммарная прибыль:_  {profit}\n"
+    )
+
+@BOT.message_handler(
+    commands=['clearj'],
+    func=lambda call: ACCOUNT_MANAGER.check_access(call.from_user.id, config.commands_access['clearj'])
+)
+def clear_journal(message):
+    DATABASE_MANAGER.clear_journal()
+    BOT.send_message(
+        chat_id=message.chat.id,
+        text="🗑️ *Журнал учета был успешно очищен*"
+    )
+
+
 
 
 @BOT.message_handler(
@@ -470,7 +496,7 @@ def flip_page(call):
                 reply_markup=helpers.create_flip_keyboard(to_page, max_page, 'journal'),
                 parse_mode="MarkdownV2",
                 text=helpers.create_journal_page(
-                    page_record,to_page,
+                    page_record, to_page,
                     DATABASE_MANAGER.get_amount_journal_records()
                 )
             )
