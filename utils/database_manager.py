@@ -254,6 +254,13 @@ class DatabaseManager:
     def get_amount_journal_records(self):
         return self.amount_journal_records
 
+
+    def get_all_of_product(self, _id):
+        from_catalog, from_journal = self.__get_product(_id), self.__get_record(_id)
+        if not from_catalog and not from_journal:
+            return False
+        return from_catalog, from_journal
+
     # HELPER:
     def get_next_product_id(self):
         return self.next_product_id
@@ -280,7 +287,7 @@ class DatabaseManager:
             return found
         return False
 
-    def __get_product_name(self, _id):
+    def get_product_name(self, _id):
         found = self.__get_product(_id)
         if found:
             return found[1]

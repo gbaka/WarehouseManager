@@ -21,7 +21,8 @@ commands_access = {
     "sell":    1,
     "profit":  2,
     "clearj":  2,
-    "setj":    2  # редактирование журнала
+    "setj":    2,  # редактирование журнала
+    "product": 0
 }
 
 info = {

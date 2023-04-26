@@ -223,6 +223,61 @@ def del_product(message):
 
 
 @BOT.message_handler(
+    commands=['product'],
+    func=lambda mes: ACCOUNT_MANAGER.check_access(mes.from_user.id, config.commands_access['product'])
+)
+def show_product_info(message):
+    """Обрабатывает команду пользователя на получение сводной информации о товаре
+                         /product <ID>"""
+    command = helpers.is_valid(message.text, r"/product\s+\d{1,8}(\s+|$)")
+    if command:
+        status = DATABASE_MANAGER.get_all_of_product(command[1])
+        if status:
+            from_catalog, from_journal = status
+            title = "📝 *Полные данные по товару:*\n\n"
+            part_1 = ['*Данные из каталога:*', 'Данных нет\n']
+            part_2 = ['*Данные из журнала учета:*', 'Данных нет\n']
+            if from_catalog:
+                _id = from_catalog[0]
+                name = from_catalog[1]
+                part_1[1] = f"_Число товара на складе:_ {from_catalog[2]}\n" \
+                            f"_Цена продажи товара:_ {from_catalog[3]}\n" \
+                            f"_Цена закупки товара:_ {from_catalog[4]}\n\n"
+            if from_journal:
+                _id = from_journal[0]
+                name = from_journal[1]
+                income = int(from_journal[3])
+                expense = int(from_journal[5])
+                part_2[1] = f"_Число продаж товара:_  {from_journal[2]}\n" \
+                            f"_Число закупок товара:_  {from_journal[4]}\n" \
+                            f"_Доход от продаж:_  {income}\n" \
+                            f"_Расход на закупки:_  {expense}\n" \
+                            f"_Прибыль:_  {income - expense}\n"
+            name = helpers.to_markdown_correct(name)
+            sub_title = f'_ID товара:_  {_id}\n' \
+                        f'_Имя товара:_  {name}\n\n'
+            text = title + sub_title + '\n'.join(part_1) + '\n'.join(part_2)
+            print(_id)
+            BOT.send_message(
+                chat_id=message.chat.id,
+                text=text,
+                reply_markup=helpers.create_action_keyboar(_id)
+            )
+            return
+        BOT.send_message(
+            chat_id=message.chat.id,
+            text='⚙️ *По товару с данным ID нет информации*'
+        )
+        return
+    BOT.send_message(
+        chat_id=message.chat.id,
+        text='❌ *Команда введена неверно.*\n\n'
+             'Формат команды:'
+             '`/product <ID>`'
+    )
+
+
+@BOT.message_handler(
     commands=['info'],
     func=lambda mes: ACCOUNT_MANAGER.check_access(mes.from_user.id, config.commands_access['info'])
 )
@@ -511,10 +566,12 @@ def keyboard_response(message):
     func=lambda call: True
 )
 def flip_page(call):
-    command = helpers.is_valid(call.data, r'[A-Za-z]+ \d+')
-    to_page = int(command[1])
+    command = helpers.is_valid(call.data, r'[A-Za-z]+((\s+\d+)|s*)')
+    command = call.data.split()
+    print(command)
     user_id = call.from_user.id
     if command[0] == 'catalog' and ACCOUNT_MANAGER.check_access(user_id, config.commands_access['catalog']):
+        to_page = int(command[1])
         max_page = DATABASE_MANAGER.get_amount_catalog_pages()
         if 1 <= to_page <= max_page:
             page_record = DATABASE_MANAGER.get_catalog_page(to_page)
@@ -528,6 +585,7 @@ def flip_page(call):
                 )
             )
     elif command[0] == 'journal' and ACCOUNT_MANAGER.check_access(user_id, config.commands_access['journal']):
+        to_page = int(command[1])
         max_page = DATABASE_MANAGER.get_amount_journal_pages()
         if 1 <= to_page <= max_page:
             page_record = DATABASE_MANAGER.get_journal_page(to_page)
@@ -541,4 +599,84 @@ def flip_page(call):
                     DATABASE_MANAGER.get_amount_journal_records()
                 )
             )
+    elif command[0] == 'sell':
+        product = DATABASE_MANAGER.get_product_name(command[1])
+        mes = BOT.send_message(
+            chat_id=call.message.chat.id,
+            text=f'Сколько единиц товара "{product}" вы хотите продать?'
+        )
+        BOT.register_next_step_handler(mes, handle_button_sell, int(command[1]))
+    elif command[0] == 'buy':
+        product = DATABASE_MANAGER.get_product_name(command[1])
+        mes = BOT.send_message(
+            chat_id=call.message.chat.id,
+            text=f'Сколько единиц товара "{product}" вы хотите купить?'
+        )
+        BOT.register_next_step_handler(mes, handle_button_buy, int(command[1]))
     BOT.answer_callback_query(callback_query_id=call.id)
+
+
+def handle_button_sell(message, _id):
+    amount = helpers.is_valid(message.text, r"^\s*\d+(\s+|$)")
+    amount = int(amount[0]) if amount else 0
+    if amount:
+        status = DATABASE_MANAGER.sell_product(_id, amount)
+        match status:
+            case 1:
+                BOT.send_message(
+                    chat_id=message.chat.id,
+                    text='⚙️ *Товара с таким ID нет в каталоге*'
+                )
+                return
+            case 2:
+                BOT.send_message(
+                    chat_id=message.chat.id,
+                    text='⚙️ *Нельзя продать товара больше, чем имеется на складе*'
+                )
+                return
+            case _:
+                sell_price = status[3]
+                BOT.send_message(
+                    chat_id=message.chat.id,
+                    text=f'✅ *Вы успешно продали {amount} единиц\(ы\) товара "{status[1]}":*\n\n'
+                         f'_ID товара:_  {status[0]}\n'
+                         f'_Имя товара:_  "{status[1]}"\n'
+                         f'_Стоимость продажи товара:_  {status[3]}\n'
+                         f'_Продано штук:_  {amount}\n'
+                         f'_*Доход от продажи:*_  *{sell_price * amount}*\n',
+                    parse_mode='MarkdownV2'
+                )
+                return
+    BOT.send_message(
+        chat_id=message.chat.id,
+        text='❌ *Количество должно быть положительным числом*.'
+    )
+
+
+def handle_button_buy(message, _id):
+    amount = helpers.is_valid(message.text, r"^\s*\d+(\s+|$)")
+    amount = int(amount[0]) if amount else 0
+    if amount:
+        status = DATABASE_MANAGER.buy_product(_id, amount)
+        if status:
+            purchase_price = status[4]
+            BOT.send_message(
+                chat_id=message.chat.id,
+                text=f'✅ *Вы успешно закупили {amount} единиц товара "{status[1]}":*\n\n'
+                     f'_ID товара:_  {status[0]}\n'
+                     f'_Имя товара:_  "{status[1]}"\n'
+                     f'_Стоимость закупки товара:_  {status[4]}\n'
+                     f'_Закуплено штук:_  {amount}\n'
+                     f'_*Расход на закупку:*_  *{purchase_price * amount}*\n',
+                parse_mode='MarkdownV2'
+            )
+            return
+        BOT.send_message(
+            chat_id=message.chat.id,
+            text='⚙️ *Товара с таким ID нет в каталоге*'
+        )
+        return
+    BOT.send_message(
+        chat_id=message.chat.id,
+        text='❌ *Количество должно быть положительным числом*.'
+    )

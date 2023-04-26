@@ -12,10 +12,7 @@ def is_valid(command_string, template, parse_markdown=True):
         return False
     command = check[0]
     if parse_markdown:
-        command = command.replace('_', '\_')
-        command = command.replace('*', '\*')
-        command = command.replace('~', '\~')
-        command = command.replace('`', '\`')
+        command = to_markdown_correct(command)
     return command.split()
 
 
@@ -76,6 +73,21 @@ def create_start_keyboard():
     markup.add(item1, item2)
     return markup
 
+def create_action_keyboar(callback_data):
+    print(f"cb is {callback_data}")
+    markup = types.InlineKeyboardMarkup()
+    sell = types.InlineKeyboardButton('Продать', callback_data=f'sell {callback_data}')
+    buy = types.InlineKeyboardButton('Купить', callback_data=f'buy {callback_data}')
+    markup.add(sell, buy)
+    return markup
+
+
+def to_markdown_correct(string):
+    string = string.replace('_', '\_')
+    string = string.replace('*', '\*')
+    string = string.replace('~', '\~')
+    string = string.replace('`', '\`')
+    return string
 
 
 def get_info(user_id, access_level):
