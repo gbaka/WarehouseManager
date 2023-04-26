@@ -104,7 +104,7 @@ def add_product(message):
             chat_id=message.chat.id,
             text='✅ *Товар добавлен в базу.*\n\n'
                  f'_ID товара:_  {product_id}\n'
-                 f'_Имя товара:_  "{command[1]}"\n'
+                 f'_Имя товара:_  "{helpers.to_markdown_correct(command[1])}"\n'
                  f'_Количество:_  {command[2]}\n'
                  f'_Стоимость продажи:_  {command[3]}\n'
                  f'_Стоимость покупки:_  {command[4]}\n'
@@ -138,7 +138,7 @@ def set_price_of_product(message):
                 chat_id=message.chat.id,
                 text=f'✅ *Цена {price_type} товара успешно изменена*\n\n'
                      f'_ID товара:_  {status[0]}\n'
-                     f'_Имя товара:_  "{status[1]}"\n'
+                     f'_Имя товара:_  "{helpers.to_markdown_correct(status[1])}"\n'
                      f'_Количество:_  {status[2]}\n'
                      f'_Стоимость покупки:_  {status[3]}\n'
                      f'_Стоимость продажи:_  {status[4]}\n'
@@ -173,7 +173,7 @@ def set_amount_of_product(message):
                 chat_id=message.chat.id,
                 text='✅ *Количество товара успешно изменено*\n\n'
                      f'_ID товара:_  {status[0]}\n'
-                     f'_Имя товара:_  "{status[1]}"\n'
+                     f'_Имя товара:_  "{helpers.to_markdown_correct(status[1])}"\n'
                      f'_Количество:_  {status[2]}\n'
                      f'_Стоимость:_  {status[3]}\n'
             )
@@ -206,7 +206,7 @@ def del_product(message):
                 chat_id=message.chat.id,
                 text='🗑️ *Товар был удален.*\n\n'
                      f'_ID товара:_  {status[0]}\n'
-                     f'_Имя товара:_  "{status[1]}"\n'
+                     f'_Имя товара:_  "{helpers.to_markdown_correct(status[1])}"\n'
             )
             return
         BOT.send_message(
@@ -385,7 +385,7 @@ def buy_product(message):
                 chat_id=message.chat.id,
                 text=f'✅ *Вы успешно закупили {command[2]} единиц товара "{status[1]}":*\n\n'
                      f'_ID товара:_  {status[0]}\n'
-                     f'_Имя товара:_  "{status[1]}"\n'
+                     f'_Имя товара:_  "{helpers.to_markdown_correct(status[1])}"\n'
                      f'_Стоимость закупки товара:_  {status[4]}\n'
                      f'_Закуплено штук:_  {command[2]}\n'
                      f'_*Расход на закупку:*_  *{purchase_price * int(command[2])}*\n',
@@ -433,7 +433,7 @@ def sell_product(message):
                     chat_id=message.chat.id,
                     text=f'✅ *Вы успешно продали {command[2]} единиц\(ы\) товара "{status[1]}":*\n\n'
                          f'_ID товара:_  {status[0]}\n'
-                         f'_Имя товара:_  "{status[1]}"\n'
+                         f'_Имя товара:_  "{helpers.to_markdown_correct(status[1])}"\n'
                          f'_Стоимость продажи товара:_  {status[3]}\n'
                          f'_Продано штук:_  {command[2]}\n'
                          f'_*Доход от продажи:*_  *{sell_price * int(command[2])}*\n',
@@ -478,7 +478,7 @@ def set_journal(message):
                 chat_id=message.chat.id,
                 text=f'{mes}\n\n'
                      f'_ID товара:_  {status[0]}\n'
-                     f'_Имя товара:_  "{status[1]}"\n'
+                     f'_Имя товара:_  "{helpers.to_markdown_correct(status[1])}"\n'
                      f'_Количество продаж:_  {status[2]}\n'
                      f'_Количество закупок:_  {status[4]}\n'
                      f'_Доход от продаж:_  {status[3]}\n'
@@ -600,14 +600,14 @@ def flip_page(call):
                 )
             )
     elif command[0] == 'sell':
-        product = DATABASE_MANAGER.get_product_name(command[1])
+        product = helpers.to_markdown_correct(DATABASE_MANAGER.get_product_name(command[1]))
         mes = BOT.send_message(
             chat_id=call.message.chat.id,
             text=f'Сколько единиц товара "{product}" вы хотите продать?'
         )
         BOT.register_next_step_handler(mes, handle_button_sell, int(command[1]))
     elif command[0] == 'buy':
-        product = DATABASE_MANAGER.get_product_name(command[1])
+        product = helpers.to_markdown_correct(DATABASE_MANAGER.get_product_name(command[1]))
         mes = BOT.send_message(
             chat_id=call.message.chat.id,
             text=f'Сколько единиц товара "{product}" вы хотите купить?'
@@ -640,7 +640,7 @@ def handle_button_sell(message, _id):
                     chat_id=message.chat.id,
                     text=f'✅ *Вы успешно продали {amount} единиц\(ы\) товара "{status[1]}":*\n\n'
                          f'_ID товара:_  {status[0]}\n'
-                         f'_Имя товара:_  "{status[1]}"\n'
+                         f'_Имя товара:_  "{helpers.to_markdown_correct(status[1])}"\n'
                          f'_Стоимость продажи товара:_  {status[3]}\n'
                          f'_Продано штук:_  {amount}\n'
                          f'_*Доход от продажи:*_  *{sell_price * amount}*\n',
@@ -664,7 +664,7 @@ def handle_button_buy(message, _id):
                 chat_id=message.chat.id,
                 text=f'✅ *Вы успешно закупили {amount} единиц товара "{status[1]}":*\n\n'
                      f'_ID товара:_  {status[0]}\n'
-                     f'_Имя товара:_  "{status[1]}"\n'
+                     f'_Имя товара:_  "{helpers.to_markdown_correct(status[1])}"\n'
                      f'_Стоимость закупки товара:_  {status[4]}\n'
                      f'_Закуплено штук:_  {amount}\n'
                      f'_*Расход на закупку:*_  *{purchase_price * amount}*\n',
