@@ -19,7 +19,6 @@ def start(message):
         chat_id=message.chat.id,
         text="*🛠 Слава труду!*\nВыбирай кнопку, которая тебя интересует.",
         reply_markup=helpers.create_start_keyboard(),
-        parse_mode='Markdown'
     )
 
 
@@ -45,7 +44,6 @@ def auth(message):
             BOT.send_message(
                 chat_id=message.chat.id,
                 text="❌ *Введен неверный ключ.*\nПожалуйста, повторите команду."
-
             )
             return
         BOT.send_message(
@@ -117,7 +115,6 @@ def add_product(message):
         text='❌ *Команда введена неверно.*\n\n'
              'Формат команды:\n'
              '`/add <name> <amount> <sell> <purchase>`'
-
     )
 
 
@@ -223,17 +220,7 @@ def del_product(message):
              'Формат команды:'
              '`/del <ID>`'
     )
-    pass
 
-
-# @BOT.message_handler(
-#     commands=['info'],
-#     func=lambda mes: ACCOUNT_MANAGER.check_access(mes.from_user.id, config.commands_access['info'])
-# )
-# def info_of_product(message):
-#     """Обрабатывает команду пользователя на получение информации о товаре"""
-#     BOT.send_message(chat_id=message.chat.id, text='access successful')
-#     pass
 
 @BOT.message_handler(
     commands=['info'],
@@ -438,8 +425,10 @@ def profit(message):
         text="📈 *Данные по выручке:*\n\n"
              f"_Cуммарный доход:_  {income}\n"
              f"_Cуммарный расход:_  {expense}\n"
-             f"_Суммарная прибыль:_  {profit}\n"
+             f"_Суммарная прибыль:_  {profit}\n\n"
+             f"_*Для более детальной информации используйте команду_ /journal"
     )
+
 
 @BOT.message_handler(
     commands=['clearj'],
@@ -451,8 +440,6 @@ def clear_journal(message):
         chat_id=message.chat.id,
         text="🗑️ *Журнал учета был успешно очищен*"
     )
-
-
 
 
 @BOT.message_handler(

@@ -82,6 +82,7 @@ def create_start_keyboard():
     return markup
 
 
+
 def get_info(user_id, access_level):
     '''Возвращает текст умной справки
     (в зависимости от уровня доступа юзера)'''

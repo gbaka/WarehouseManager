@@ -204,6 +204,7 @@ class DatabaseManager:
     def clear_journal(self):
         self.cursor.execute("DELETE FROM `journal`")
         self.connection.commit()
+        self.amount_journal_records = 0
 
     def get_catalog_page(self, page):
         """Возвращает запрашиваемую страницу из каталога (количество страниц в каталоге определяется в config)
