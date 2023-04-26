@@ -1,2 +1,162 @@
 2023-04-26 23:13:33,852 INFO database is open
 2023-04-26 23:13:33,853 INFO bot is running
+2023-04-26 23:21:25,186 ERROR Infinity polling exception: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+2023-04-26 23:21:25,188 ERROR Exception traceback:
+Traceback (most recent call last):
+  File "C:\Users\User\PycharmProjects\WarehouseManager\venv\lib\site-packages\urllib3\connectionpool.py", line 703, in urlopen
+    httplib_response = self._make_request(
+  File "C:\Users\User\PycharmProjects\WarehouseManager\venv\lib\site-packages\urllib3\connectionpool.py", line 449, in _make_request
+    six.raise_from(e, None)
+  File "<string>", line 3, in raise_from
+  File "C:\Users\User\PycharmProjects\WarehouseManager\venv\lib\site-packages\urllib3\connectionpool.py", line 444, in _make_request
+    httplib_response = conn.getresponse()
+  File "C:\Users\User\AppData\Local\Programs\Python\Python310\lib\http\client.py", line 1375, in getresponse
+    response.begin()
+  File "C:\Users\User\AppData\Local\Programs\Python\Python310\lib\http\client.py", line 318, in begin
+    version, status, reason = self._read_status()
+  File "C:\Users\User\AppData\Local\Programs\Python\Python310\lib\http\client.py", line 287, in _read_status
+    raise RemoteDisconnected("Remote end closed connection without"
+http.client.RemoteDisconnected: Remote end closed connection without response
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\User\PycharmProjects\WarehouseManager\venv\lib\site-packages\requests\adapters.py", line 489, in send
+    resp = conn.urlopen(
+  File "C:\Users\User\PycharmProjects\WarehouseManager\venv\lib\site-packages\urllib3\connectionpool.py", line 787, in urlopen
+    retries = retries.increment(
+  File "C:\Users\User\PycharmProjects\WarehouseManager\venv\lib\site-packages\urllib3\util\retry.py", line 550, in increment
+    raise six.reraise(type(error), error, _stacktrace)
+  File "C:\Users\User\PycharmProjects\WarehouseManager\venv\lib\site-packages\urllib3\packages\six.py", line 769, in reraise
+    raise value.with_traceback(tb)
+  File "C:\Users\User\PycharmProjects\WarehouseManager\venv\lib\site-packages\urllib3\connectionpool.py", line 703, in urlopen
+    httplib_response = self._make_request(
+  File "C:\Users\User\PycharmProjects\WarehouseManager\venv\lib\site-packages\urllib3\connectionpool.py", line 449, in _make_request
+    six.raise_from(e, None)
+  File "<string>", line 3, in raise_from
+  File "C:\Users\User\PycharmProjects\WarehouseManager\venv\lib\site-packages\urllib3\connectionpool.py", line 444, in _make_request
+    httplib_response = conn.getresponse()
+  File "C:\Users\User\AppData\Local\Programs\Python\Python310\lib\http\client.py", line 1375, in getresponse
+    response.begin()
+  File "C:\Users\User\AppData\Local\Programs\Python\Python310\lib\http\client.py", line 318, in begin
+    version, status, reason = self._read_status()
+  File "C:\Users\User\AppData\Local\Programs\Python\Python310\lib\http\client.py", line 287, in _read_status
+    raise RemoteDisconnected("Remote end closed connection without"
+urllib3.exceptions.ProtocolError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\User\PycharmProjects\WarehouseManager\venv\lib\site-packages\telebot\__init__.py", line 955, in infinity_polling
+    self.polling(non_stop=True, timeout=timeout, long_polling_timeout=long_polling_timeout,
+  File "C:\Users\User\PycharmProjects\WarehouseManager\venv\lib\site-packages\telebot\__init__.py", line 1043, in polling
+    self.__threaded_polling(non_stop=non_stop, interval=interval, timeout=timeout, long_polling_timeout=long_polling_timeout,
+  File "C:\Users\User\PycharmProjects\WarehouseManager\venv\lib\site-packages\telebot\__init__.py", line 1118, in __threaded_polling
+    raise e
+  File "C:\Users\User\PycharmProjects\WarehouseManager\venv\lib\site-packages\telebot\__init__.py", line 1074, in __threaded_polling
+    self.worker_pool.raise_exceptions()
+  File "C:\Users\User\PycharmProjects\WarehouseManager\venv\lib\site-packages\telebot\util.py", line 147, in raise_exceptions
+    raise self.exception_info
+  File "C:\Users\User\PycharmProjects\WarehouseManager\venv\lib\site-packages\telebot\util.py", line 90, in run
+    task(*args, **kwargs)
+  File "C:\Users\User\PycharmProjects\WarehouseManager\venv\lib\site-packages\telebot\__init__.py", line 6720, in _run_middlewares_and_handler
+    result = handler['function'](message)
+  File "C:\Users\User\PycharmProjects\WarehouseManager\handlers\comand_handlers.py", line 560, in keyboard_response
+    show_catalog(message)
+  File "C:\Users\User\PycharmProjects\WarehouseManager\handlers\comand_handlers.py", line 305, in show_catalog
+    BOT.send_message(
+  File "C:\Users\User\PycharmProjects\WarehouseManager\venv\lib\site-packages\telebot\__init__.py", line 1549, in send_message
+    apihelper.send_message(
+  File "C:\Users\User\PycharmProjects\WarehouseManager\venv\lib\site-packages\telebot\apihelper.py", line 264, in send_message
+    return _make_request(token, method_url, params=payload, method='post')
+  File "C:\Users\User\PycharmProjects\WarehouseManager\venv\lib\site-packages\telebot\apihelper.py", line 156, in _make_request
+    result = _get_req_session().request(
+  File "C:\Users\User\PycharmProjects\WarehouseManager\venv\lib\site-packages\requests\sessions.py", line 587, in request
+    resp = self.send(prep, **send_kwargs)
+  File "C:\Users\User\PycharmProjects\WarehouseManager\venv\lib\site-packages\requests\sessions.py", line 701, in send
+    r = adapter.send(request, **kwargs)
+  File "C:\Users\User\PycharmProjects\WarehouseManager\venv\lib\site-packages\requests\adapters.py", line 547, in send
+    raise ConnectionError(err, request=request)
+requests.exceptions.ConnectionError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+
+2023-04-26 23:21:28,559 ERROR Infinity polling exception: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+2023-04-26 23:21:28,561 ERROR Exception traceback:
+Traceback (most recent call last):
+  File "C:\Users\User\PycharmProjects\WarehouseManager\venv\lib\site-packages\urllib3\connectionpool.py", line 703, in urlopen
+    httplib_response = self._make_request(
+  File "C:\Users\User\PycharmProjects\WarehouseManager\venv\lib\site-packages\urllib3\connectionpool.py", line 449, in _make_request
+    six.raise_from(e, None)
+  File "<string>", line 3, in raise_from
+  File "C:\Users\User\PycharmProjects\WarehouseManager\venv\lib\site-packages\urllib3\connectionpool.py", line 444, in _make_request
+    httplib_response = conn.getresponse()
+  File "C:\Users\User\AppData\Local\Programs\Python\Python310\lib\http\client.py", line 1375, in getresponse
+    response.begin()
+  File "C:\Users\User\AppData\Local\Programs\Python\Python310\lib\http\client.py", line 318, in begin
+    version, status, reason = self._read_status()
+  File "C:\Users\User\AppData\Local\Programs\Python\Python310\lib\http\client.py", line 287, in _read_status
+    raise RemoteDisconnected("Remote end closed connection without"
+http.client.RemoteDisconnected: Remote end closed connection without response
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\User\PycharmProjects\WarehouseManager\venv\lib\site-packages\requests\adapters.py", line 489, in send
+    resp = conn.urlopen(
+  File "C:\Users\User\PycharmProjects\WarehouseManager\venv\lib\site-packages\urllib3\connectionpool.py", line 787, in urlopen
+    retries = retries.increment(
+  File "C:\Users\User\PycharmProjects\WarehouseManager\venv\lib\site-packages\urllib3\util\retry.py", line 550, in increment
+    raise six.reraise(type(error), error, _stacktrace)
+  File "C:\Users\User\PycharmProjects\WarehouseManager\venv\lib\site-packages\urllib3\packages\six.py", line 769, in reraise
+    raise value.with_traceback(tb)
+  File "C:\Users\User\PycharmProjects\WarehouseManager\venv\lib\site-packages\urllib3\connectionpool.py", line 703, in urlopen
+    httplib_response = self._make_request(
+  File "C:\Users\User\PycharmProjects\WarehouseManager\venv\lib\site-packages\urllib3\connectionpool.py", line 449, in _make_request
+    six.raise_from(e, None)
+  File "<string>", line 3, in raise_from
+  File "C:\Users\User\PycharmProjects\WarehouseManager\venv\lib\site-packages\urllib3\connectionpool.py", line 444, in _make_request
+    httplib_response = conn.getresponse()
+  File "C:\Users\User\AppData\Local\Programs\Python\Python310\lib\http\client.py", line 1375, in getresponse
+    response.begin()
+  File "C:\Users\User\AppData\Local\Programs\Python\Python310\lib\http\client.py", line 318, in begin
+    version, status, reason = self._read_status()
+  File "C:\Users\User\AppData\Local\Programs\Python\Python310\lib\http\client.py", line 287, in _read_status
+    raise RemoteDisconnected("Remote end closed connection without"
+urllib3.exceptions.ProtocolError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\User\PycharmProjects\WarehouseManager\venv\lib\site-packages\telebot\__init__.py", line 955, in infinity_polling
+    self.polling(non_stop=True, timeout=timeout, long_polling_timeout=long_polling_timeout,
+  File "C:\Users\User\PycharmProjects\WarehouseManager\venv\lib\site-packages\telebot\__init__.py", line 1043, in polling
+    self.__threaded_polling(non_stop=non_stop, interval=interval, timeout=timeout, long_polling_timeout=long_polling_timeout,
+  File "C:\Users\User\PycharmProjects\WarehouseManager\venv\lib\site-packages\telebot\__init__.py", line 1118, in __threaded_polling
+    raise e
+  File "C:\Users\User\PycharmProjects\WarehouseManager\venv\lib\site-packages\telebot\__init__.py", line 1074, in __threaded_polling
+    self.worker_pool.raise_exceptions()
+  File "C:\Users\User\PycharmProjects\WarehouseManager\venv\lib\site-packages\telebot\util.py", line 147, in raise_exceptions
+    raise self.exception_info
+  File "C:\Users\User\PycharmProjects\WarehouseManager\venv\lib\site-packages\telebot\util.py", line 90, in run
+    task(*args, **kwargs)
+  File "C:\Users\User\PycharmProjects\WarehouseManager\venv\lib\site-packages\telebot\__init__.py", line 6720, in _run_middlewares_and_handler
+    result = handler['function'](message)
+  File "C:\Users\User\PycharmProjects\WarehouseManager\handlers\comand_handlers.py", line 562, in keyboard_response
+    info(message)
+  File "C:\Users\User\PycharmProjects\WarehouseManager\handlers\comand_handlers.py", line 286, in info
+    BOT.send_message(
+  File "C:\Users\User\PycharmProjects\WarehouseManager\venv\lib\site-packages\telebot\__init__.py", line 1549, in send_message
+    apihelper.send_message(
+  File "C:\Users\User\PycharmProjects\WarehouseManager\venv\lib\site-packages\telebot\apihelper.py", line 264, in send_message
+    return _make_request(token, method_url, params=payload, method='post')
+  File "C:\Users\User\PycharmProjects\WarehouseManager\venv\lib\site-packages\telebot\apihelper.py", line 156, in _make_request
+    result = _get_req_session().request(
+  File "C:\Users\User\PycharmProjects\WarehouseManager\venv\lib\site-packages\requests\sessions.py", line 587, in request
+    resp = self.send(prep, **send_kwargs)
+  File "C:\Users\User\PycharmProjects\WarehouseManager\venv\lib\site-packages\requests\sessions.py", line 701, in send
+    r = adapter.send(request, **kwargs)
+  File "C:\Users\User\PycharmProjects\WarehouseManager\venv\lib\site-packages\requests\adapters.py", line 547, in send
+    raise ConnectionError(err, request=request)
+requests.exceptions.ConnectionError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+
+2023-04-26 23:22:37,883 ERROR Infinity polling: polling exited
+2023-04-26 23:22:37,883 ERROR Break infinity polling
