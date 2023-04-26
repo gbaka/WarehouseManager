@@ -14,6 +14,7 @@ class DatabaseManager:
         self.cursor = self.connection.cursor()
         self.init_database()
 
+    # DB:
     def init_database(self):
         self.cursor.execute("SELECT `name` FROM sqlite_master WHERE type='table'")
         tables_list = list(map(lambda tuple_obj: tuple_obj[0], self.cursor.fetchall()))
@@ -50,6 +51,11 @@ class DatabaseManager:
         self.amount_journal_records = found[0]
         self.connection.commit()
 
+    def close(self):
+        self.connection.close()
+        logging.info("database is closed")
+
+    # AUTH:
     def check_auth(self, code):
         code = code.strip()
         self.cursor.execute(
@@ -61,6 +67,7 @@ class DatabaseManager:
             return 0
         return res[1]
 
+    # CATALOG:
     def add_product(self, name, amount, s_price, p_price):
         """Если продукт с таким именем уже есть - добавления не происходит и возвращается id продукта
                    иначе происходит добавление продукта и возвращается False"""
@@ -122,21 +129,37 @@ class DatabaseManager:
         self.connection.commit()
         return self.__get_product(_id)
 
-    # JOURNAL
+    def get_catalog_page(self, page):
+        """Возвращает запрашиваемую страницу из каталога (количество страниц в каталоге определяется в config)
+                Если страницы в каталоге нет возвращается False"""
+        self.cursor.execute(
+            "SELECT * FROM `goods` LIMIT ? OFFSET ?",
+            (config.catalog_offset, (page - 1) * config.catalog_offset)
+        )
+        found = self.cursor.fetchall()
+        if len(found) == 0:
+            return False
+        return found
+
+    def get_amount_goods(self):
+        return self.amount_goods
+
+    def get_amount_catalog_pages(self):
+        return math.ceil(self.amount_goods / config.catalog_offset)
+
+    # JOURNAL:
     def buy_product(self, _id, amount):
         """Если товара нет в базе - возвращается False
                    Иначе возвращаем запись о товаре в каталоге"""
         is_exist = self.__get_product(_id)
         if not is_exist:
             return False
-
         # увеличиваем кол-во товара в каталоге
         self.cursor.execute(
             "UPDATE `goods` SET "
             "`amount` = `amount` +  ? WHERE `id` = ?",
             (amount, _id)
         )
-
         # добавляем или изменяем запись в журнале учета
         purchase_price = int(is_exist[4])
         amount = int(amount)
@@ -174,7 +197,6 @@ class DatabaseManager:
             "`amount` = `amount` -  ? WHERE `id` = ?",
             (amount, _id)
         )
-
         # добавляем или изменяем запись в журнале учета
         sell_price = int(is_exist[3])
         found = self.__get_record(_id)
@@ -197,8 +219,7 @@ class DatabaseManager:
         self.connection.commit()
         return is_exist
 
-
-    def journal_set(self,_id, value, column) -> bool | list:
+    def journal_set(self, _id, value, column) -> bool | list:
         """Если продукта с таким id нет - значение изменить невозможно и возвращаем False,
                    в противном случае возвращается запись о продукте (обновленную)"""
         found = self.__get_record(_id)
@@ -207,23 +228,6 @@ class DatabaseManager:
         self.cursor.execute(f"UPDATE `journal` SET {column} = ? WHERE `id` = ?", (value, _id))
         self.connection.commit()
         return self.__get_record(_id)
-
-
-    def set_amount_purchase(self, _id, amount):
-        """Если продукта с таким id нет - изменить количество продаж невозможно и возвращаем False,
-                в противном случае возвращается запись о продукте (обновленную)"""
-        found = self.__get_record(_id)
-        if not found:
-            return False
-        self.cursor.execute("UPDATE `journal` SET `amount` = ? WHERE `id` = ?", (amount, _id))
-        self.connection.commit()
-        return self.__get_record(_id)
-
-    def set_sold_on(self, _id, sold_on):
-        pass
-
-    def set_purchased_on(self, _id, purchased_on):
-        pass
 
     def calculate_profit(self):
         select = self.cursor.execute("SELECT SUM(`sold_on`), SUM(`purchased_on`) FROM `journal`")
@@ -235,18 +239,6 @@ class DatabaseManager:
         self.connection.commit()
         self.amount_journal_records = 0
 
-    def get_catalog_page(self, page):
-        """Возвращает запрашиваемую страницу из каталога (количество страниц в каталоге определяется в config)
-                Если страницы в каталоге нет возвращается False"""
-        self.cursor.execute(
-            "SELECT * FROM `goods` LIMIT ? OFFSET ?",
-            (config.catalog_offset, (page - 1) * config.catalog_offset)
-        )
-        found = self.cursor.fetchall()
-        if len(found) == 0:
-            return False
-        return found
-
     def get_journal_page(self, page):
         """None"""
         self.cursor.execute("SELECT * FROM `journal` LIMIT ? OFFSET ?",
@@ -256,26 +248,16 @@ class DatabaseManager:
             return False
         return found
 
-    def get_next_product_id(self):
-        return self.next_product_id
-
-    def get_amount_catalog_pages(self):
-        return math.ceil(self.amount_goods / config.catalog_offset)
-
     def get_amount_journal_pages(self):
         return math.ceil(self.amount_journal_records / config.journal_offset)
-
-    def get_amount_goods(self):
-        return self.amount_goods
 
     def get_amount_journal_records(self):
         return self.amount_journal_records
 
-    def close(self):
-        self.connection.close()
-        logging.info("database is closed")
+    # HELPER:
+    def get_next_product_id(self):
+        return self.next_product_id
 
-    # HELPER FUNCTIONS:
     def __get_product(self, _id) -> bool | list:
         """Возвращает запись о продукте из каталога, если продукта с указанным ID нет - вернет False"""
         self.cursor.execute(

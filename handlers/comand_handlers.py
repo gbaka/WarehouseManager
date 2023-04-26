@@ -443,7 +443,7 @@ def set_journal(message):
         chat_id=message.chat.id,
         text='❌ *Команда введена неверно.*\n\n'
              f'Формат команды:\n'
-             f'`{command} <ID> <{val}>`'
+             f'`{command} <id> <{val}>`'
     )
 
 
