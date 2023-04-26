@@ -214,7 +214,7 @@ def del_product(message):
             return
         BOT.send_message(
             chat_id=message.chat.id,
-            text='⚙️ *Товара с таким ID нет в базе*'
+            text='⚙️ *Товара с таким ID нет в каталоге*'
         )
         return
     BOT.send_message(
@@ -333,10 +333,38 @@ def show_journal(message):
     func=lambda mes: ACCOUNT_MANAGER.check_access(mes.from_user.id, config.commands_access['buy'])
 )
 def buy_product(message):
-    command = helpers.is_valid(message.text, r"/buy\s+\d{1,8}\s+d{1,16}(\s+|\$)")
-    if command:
+    """/buy <id> <amount>"""
+    command = helpers.is_valid(message.text, r"/buy\s+\d{1,8}\s+[1-9]\d{0,15}(\s+|$)")
 
-        pass
+    if command:
+        status = DATABASE_MANAGER.buy_product(command[1], command[2])
+        if status:
+            purchase_price = status[4]
+            BOT.send_message(
+                chat_id=message.chat.id,
+                text=f'✅ *Вы успешно закупили {command[2]} единиц товара "{status[1]}":*\n\n'
+                     f'_ID товара:_  {status[0]}\n'
+                     f'_Имя товара:_  "{status[1]}"\n'
+                     f'_Стоимость закупки товара:_  {status[4]}\n'
+                     f'_Закуплено штук:_  {command[2]}\n'
+                     f'_Расход на закупку:_  {purchase_price * int(command[2])}\n'
+            )
+            return
+        BOT.send_message(
+            chat_id=message.chat.id,
+            text='⚙️ *Товара с таким ID нет в каталоге*'
+        )
+        return
+    BOT.send_message(
+        chat_id=message.chat.id,
+        text='❌ *Команда введена неверно*.\n\n'
+             'Формат команды:\n'
+             '`/buy <id> <amount>`'
+    )
+
+
+
+
 
 
 @BOT.message_handler(

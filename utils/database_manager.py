@@ -123,11 +123,42 @@ class DatabaseManager:
 
     # JOURNAL
     def buy_product(self, _id, amount):
-        """Если товара нет в базе - возвращается False"""
+        """Если товара нет в базе - возвращается False
+            Иначе возвращаем запись о товаре в каталоге"""
         is_exist = self.__get_product(_id)
         if not is_exist:
             return False
-        found = self.get
+
+        # увеличиваем кол-во товара в каталоге
+        self.cursor.execute(
+            "UPDATE `goods` SET "
+            "`amount` = `amount` +  ? WHERE `id` = ?",
+            (amount, _id)
+        )
+
+        self.amount_journal_records += 1
+
+        # добавляем или изменяем запись в журнале учета
+        purchase_price = int(is_exist[4])
+        amount = int(amount)
+        found = self.__get_record(_id)
+        if found:
+            self.cursor.execute(
+                "UPDATE `journal` SET "
+                "`amount_purchases` = `amount_purchases` + ?, "
+                "`purchased_on` = `purchased_on` + ? "
+                "WHERE `id` = ? ",
+                (amount, amount * purchase_price, _id)
+            )
+            self.connection.commit()
+            return is_exist
+        name = is_exist[1]
+        self.cursor.execute(
+            "INSERT INTO `journal` VALUES(?, ?, ?, ?, ?, ?)",
+            (_id, name, 0, 0, amount, amount * purchase_price)
+        )
+        self.connection.commit()
+        return is_exist
 
 
     def get_catalog_page(self, page):
@@ -176,19 +207,20 @@ class DatabaseManager:
             (_id,)
         )
         found = self.cursor.fetchone()
-        if found is not None:
+        if found:
             return found
         return False
 
-    def __get_record(self, _id):
+    def __get_record(self, _id) -> bool | list:
         """Возвращает запись о продукте из журнала учета, если продукта с указанным ID нет - вернет False"""
         self.cursor.execute(
             "SELECT * FROM `journal` WHERE `id` = ?",
             (_id,)
         )
         found = self.cursor.fetchone()
-        if found is not None:
-            return
+        if found:
+            return found
+        return False
 
     def __get_product_name(self, _id):
         found = self.__get_product(_id)
