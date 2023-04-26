@@ -77,7 +77,7 @@ class DatabaseManager:
 
     def del_product(self, _id):
         """Если продукта с таким id нет - удаление невозможно и возвращается False,
-                   иначе происходит удаление и возвращается запись о продукте"""
+                           иначе происходит удаление и возвращается запись о продукте"""
         # если товара с таким id нет - возвращаем False
         found = self.__get_product(_id)
         if not found:
@@ -113,7 +113,7 @@ class DatabaseManager:
     # set amount
     def seta(self, _id, amount):
         """Если продукта с таким id нет - изменить количество невозможно и возвращаем False,
-                         в противном случае возвращается запись о продукте (обновленную)"""
+                   в противном случае возвращается запись о продукте (обновленную)"""
         found = self.__get_product(_id)
         if not found:
             return False
@@ -124,7 +124,7 @@ class DatabaseManager:
     # JOURNAL
     def buy_product(self, _id, amount):
         """Если товара нет в базе - возвращается False
-            Иначе возвращаем запись о товаре в каталоге"""
+                   Иначе возвращаем запись о товаре в каталоге"""
         is_exist = self.__get_product(_id)
         if not is_exist:
             return False
@@ -195,6 +195,34 @@ class DatabaseManager:
         self.amount_journal_records += 1
         self.connection.commit()
         return is_exist
+
+
+    def journal_set(self,_id, value, column) -> bool | list:
+        """Если продукта с таким id нет - значение изменить невозможно и возвращаем False,
+                   в противном случае возвращается запись о продукте (обновленную)"""
+        found = self.__get_record(_id)
+        if not found:
+            return False
+        self.cursor.execute(f"UPDATE `journal` SET {column} = ? WHERE `id` = ?", (value, _id))
+        self.connection.commit()
+        return self.__get_record(_id)
+
+
+    def set_amount_purchase(self, _id, amount):
+        """Если продукта с таким id нет - изменить количество продаж невозможно и возвращаем False,
+                в противном случае возвращается запись о продукте (обновленную)"""
+        found = self.__get_record(_id)
+        if not found:
+            return False
+        self.cursor.execute("UPDATE `journal` SET `amount` = ? WHERE `id` = ?", (amount, _id))
+        self.connection.commit()
+        return self.__get_record(_id)
+
+    def set_sold_on(self, _id, sold_on):
+        pass
+
+    def set_purchased_on(self, _id, purchased_on):
+        pass
 
     def calculate_profit(self):
         select = self.cursor.execute("SELECT SUM(`sold_on`), SUM(`purchased_on`) FROM `journal`")

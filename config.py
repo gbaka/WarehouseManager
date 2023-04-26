@@ -20,7 +20,8 @@ commands_access = {
     "buy":     0,
     "sell":    0,
     "profit":  0,
-    "clearj":  0
+    "clearj":  0,
+    "setj":    0  #редактирование журнала
 }
 
 

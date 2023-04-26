@@ -394,6 +394,91 @@ def sell_product(message):
 
 
 @BOT.message_handler(
+    commands=['setas', 'setso', 'setap','setpo'],
+    func=lambda mes: ACCOUNT_MANAGER.check_access(mes.from_user.id, config.commands_access['setj'])
+)
+def set_journal(message):
+    command = helpers.is_valid(message.text, r"/(setas|setso|setap|setpo)\s+\d{1,8}\s+\d{1,16}(\s+|$)")
+    if command:
+        match command[0]:
+            case '/setas':
+                status = DATABASE_MANAGER.journal_set(command[1], command[2], "`amount_sales`")
+                mes = "✅ *Количество продаж товара успешно изменено:*"
+            case '/setso':
+                status = DATABASE_MANAGER.journal_set(command[1], command[2], "`sold_on`")
+                mes = "✅ *Доход от продаж товара успешно изменён:*"
+            case '/setap':
+                status = DATABASE_MANAGER.journal_set(command[1], command[2], "`amount_purchases`")
+                mes = "✅ *Количество покупок товара успешно изменено:*"
+            case '/setpo':
+                status = DATABASE_MANAGER.journal_set(command[1], command[2], "`purchased_on`")
+                mes = "✅ *Расход на закупки товара успешно изменён:*"
+            case _:
+                status = False
+                mes = None
+        if status:
+            _profit = int(status[3]) - int(status[5])
+            _profit = '\-' + str(-_profit) if _profit < 0 else _profit
+            BOT.send_message(
+                chat_id=message.chat.id,
+                text=f'{mes}\n\n'
+                     f'_ID товара:_  {status[0]}\n'
+                     f'_Имя товара:_  "{status[1]}"\n'
+                     f'_Количество продаж:_  {status[2]}\n'
+                     f'_Количество закупок:_  {status[4]}\n'
+                     f'_Доход от продаж:_  {status[3]}\n'
+                     f'_Расход на закупки:_  {status[5]}\n'
+                     f'_*Прибыль:*_  *{_profit}*\n',
+                parse_mode='MarkdownV2'
+            )
+            return
+        BOT.send_message(
+            chat_id=message.chat.id,
+            text='⚙️ *Товара с таким ID нет в журнале учета*'
+        )
+        return
+    command = message.text.split()[0]
+    val = "value" if command in ['/setso', '/setpo'] else "amount"
+    BOT.send_message(
+        chat_id=message.chat.id,
+        text='❌ *Команда введена неверно.*\n\n'
+             f'Формат команды:\n'
+             f'`{command} <ID> <{val}>`'
+    )
+
+
+
+
+
+@BOT.message_handler(
+    commands=['profit'],
+    func=lambda call: ACCOUNT_MANAGER.check_access(call.from_user.id, config.commands_access['profit'])
+)
+def profit(message):
+    income, expense, profit = DATABASE_MANAGER.calculate_profit()
+    BOT.send_message(
+        chat_id=message.chat.id,
+        text="📈 *Данные по выручке:*\n\n"
+             f"_Cуммарный доход:_  {income}\n"
+             f"_Cуммарный расход:_  {expense}\n"
+             f"_Суммарная прибыль:_  {profit}\n\n"
+             f"_*Для более детальной информации используйте команду_ /journal"
+    )
+
+
+
+@BOT.message_handler(
+    commands=['clearj'],
+    func=lambda call: ACCOUNT_MANAGER.check_access(call.from_user.id, config.commands_access['clearj'])
+)
+def clear_journal(message):
+    DATABASE_MANAGER.clear_journal()
+    BOT.send_message(
+        chat_id=message.chat.id,
+        text="🗑️ *Журнал учета был успешно очищен*"
+    )
+
+@BOT.message_handler(
     commands=['myrole'],
     func=lambda call: ACCOUNT_MANAGER.check_access(call.from_user.id, config.commands_access['myrole'])
 )
@@ -414,32 +499,6 @@ def get_my_role(message):
     )
 
 
-@BOT.message_handler(
-    commands=['profit'],
-    func=lambda call: ACCOUNT_MANAGER.check_access(call.from_user.id, config.commands_access['profit'])
-)
-def profit(message):
-    income, expense, profit = DATABASE_MANAGER.calculate_profit()
-    BOT.send_message(
-        chat_id=message.chat.id,
-        text="📈 *Данные по выручке:*\n\n"
-             f"_Cуммарный доход:_  {income}\n"
-             f"_Cуммарный расход:_  {expense}\n"
-             f"_Суммарная прибыль:_  {profit}\n\n"
-             f"_*Для более детальной информации используйте команду_ /journal"
-    )
-
-
-@BOT.message_handler(
-    commands=['clearj'],
-    func=lambda call: ACCOUNT_MANAGER.check_access(call.from_user.id, config.commands_access['clearj'])
-)
-def clear_journal(message):
-    DATABASE_MANAGER.clear_journal()
-    BOT.send_message(
-        chat_id=message.chat.id,
-        text="🗑️ *Журнал учета был успешно очищен*"
-    )
 
 
 @BOT.message_handler(
