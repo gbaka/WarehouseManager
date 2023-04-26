@@ -478,11 +478,11 @@ def set_journal(message):
                 chat_id=message.chat.id,
                 text=f'{mes}\n\n'
                      f'_ID товара:_  {status[0]}\n'
-                     f'_Имя товара:_  "{helpers.to_markdown_correct(status[1])}"\n'
+                     f'_Имя товара:_  "{helpers.to_markdown_correct(status[1], 2)}"\n'
                      f'_Количество продаж:_  {status[2]}\n'
                      f'_Количество закупок:_  {status[4]}\n'
                      f'_Доход от продаж:_  {status[3]}\n'
-                     f'_Расход на закупки:_  {status[5]}\n'
+                     f'_Расход на закупки и прочее:_  {status[5]}\n'
                      f'_*Прибыль:*_  *{_profit}*\n',
                 parse_mode='MarkdownV2'
             )
@@ -517,6 +517,47 @@ def profit(message):
              f"_*Для более детальной информации используйте команду_ /journal"
     )
 
+
+@BOT.message_handler(
+    commands=['addpo'],
+    func=lambda call: ACCOUNT_MANAGER.check_access(call.from_user.id, config.commands_access['profit'])
+)
+def add_expense(message):
+
+    command = helpers.is_valid(message.text, r"/addpo\s+\d{1,8}\s+\d{1,16}(\s+|$)")
+    if command:
+        record = DATABASE_MANAGER.get_record(command[1])
+        if record:
+            purchased_on = record[5]
+            name = record[1]
+            DATABASE_MANAGER.journal_set(command[1], purchased_on + int(command[2]), "`purchased_on`")
+            _profit = int(record[3]) - int(record[5] - purchased_on)
+            _profit = '\-' + str(-_profit) if _profit < 0 else _profit
+            BOT.send_message(
+                chat_id=message.chat.id,
+                text=f'*✅ Дополнительный расход в размере {purchased_on} по товару '
+                     f'{helpers.to_markdown_correct(name, 2)} успешно добавлен в журнал учета*:\n\n'
+                     f'_ID товара:_  {record[0]}\n'
+                     f'_Имя товара:_  "{helpers.to_markdown_correct(name, 2)}"\n'
+                     f'_Количество продаж:_  {record[2]}\n'
+                     f'_Количество закупок:_  {record[4]}\n'
+                     f'_Доход от продаж:_  {record[3]}\n'
+                     f'_Расход на закупки и прочее:_  {record[5] + purchased_on}\n'
+                     f'_*Прибыль:*_  *{_profit}*\n',
+                parse_mode='MarkdownV2'
+            )
+            return
+        BOT.send_message(
+            chat_id=message.chat.id,
+            text='⚙️ *Товара с таким ID нет в журнале учета*'
+        )
+        return
+    BOT.send_message(
+        chat_id=message.chat.id,
+        text='❌ *Команда введена неверно.*\n\n'
+             f'Формат команды:\n'
+             f'`/addpo <id> <значение>`'
+    )
 
 @BOT.message_handler(
     commands=['clearj'],
@@ -565,7 +606,7 @@ def keyboard_response(message):
 @BOT.callback_query_handler(
     func=lambda call: True
 )
-def flip_page(call):
+def callback_handler(call):
     command = helpers.is_valid(call.data, r'[A-Za-z]+((\s+\d+)|s*)')
     command = call.data.split()
     print(command)
@@ -599,14 +640,14 @@ def flip_page(call):
                     DATABASE_MANAGER.get_amount_journal_records()
                 )
             )
-    elif command[0] == 'sell':
+    elif command[0] == 'sell' and ACCOUNT_MANAGER.check_access(user_id, config.commands_access['sell']):
         product = helpers.to_markdown_correct(DATABASE_MANAGER.get_product_name(command[1]))
         mes = BOT.send_message(
             chat_id=call.message.chat.id,
             text=f'Сколько единиц товара "{product}" вы хотите продать?'
         )
         BOT.register_next_step_handler(mes, handle_button_sell, int(command[1]))
-    elif command[0] == 'buy':
+    elif command[0] == 'buy' and ACCOUNT_MANAGER.check_access(user_id, config.commands_access['buy']):
         product = helpers.to_markdown_correct(DATABASE_MANAGER.get_product_name(command[1]))
         mes = BOT.send_message(
             chat_id=call.message.chat.id,

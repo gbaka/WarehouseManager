@@ -46,7 +46,7 @@ def create_journal_page(journal_page: list, page: int, records_amount: int) -> s
         text += f'_Количество продаж:_  {record[2]}\n'
         text += f'_Количество закупок:_  {record[4]}\n'
         text += f'_Доход от продаж:_  {record[3]}\n'
-        text += f'_Расход на закупки:_  {record[5]}\n'
+        text += f'_Расход на закупки и прочее:_  {record[5]}\n'
         profit = int(record[3])-int(record[5])
         profit = '\-' + str(-profit) if profit < 0 else profit
         text += f'_*Прибыль:*_  *{profit}*\n'
@@ -90,6 +90,8 @@ def to_markdown_correct(string, markdown_v = 1):
     if markdown_v == 2:
         string = string.replace('.', '\.')
         string = string.replace('-', '\-')
+        string = string.replace('>', '\>')
+        string = string.replace('<', '\<')
     return string
 
 

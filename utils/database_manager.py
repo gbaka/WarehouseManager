@@ -163,7 +163,7 @@ class DatabaseManager:
         # добавляем или изменяем запись в журнале учета
         purchase_price = int(is_exist[4])
         amount = int(amount)
-        found = self.__get_record(_id)
+        found = self.get_record(_id)
         if found:
             self.cursor.execute(
                 "UPDATE `journal` SET "
@@ -199,7 +199,7 @@ class DatabaseManager:
         )
         # добавляем или изменяем запись в журнале учета
         sell_price = int(is_exist[3])
-        found = self.__get_record(_id)
+        found = self.get_record(_id)
         if found:
             self.cursor.execute(
                 "UPDATE `journal` SET "
@@ -222,16 +222,20 @@ class DatabaseManager:
     def journal_set(self, _id, value, column) -> bool | list:
         """Если продукта с таким id нет - значение изменить невозможно и возвращаем False,
                    в противном случае возвращается запись о продукте (обновленную)"""
-        found = self.__get_record(_id)
+        found = self.get_record(_id)
         if not found:
             return False
         self.cursor.execute(f"UPDATE `journal` SET {column} = ? WHERE `id` = ?", (value, _id))
         self.connection.commit()
-        return self.__get_record(_id)
+        return self.get_record(_id)
 
     def calculate_profit(self):
         select = self.cursor.execute("SELECT SUM(`sold_on`), SUM(`purchased_on`) FROM `journal`")
-        income, expense = list(map(int, select.fetchone()))
+        res = select.fetchone()
+        print(res)
+        if res is None:
+            return 0, 0, 0
+        income, expense = res
         return income, expense, income - expense
 
     def clear_journal(self):
@@ -248,6 +252,12 @@ class DatabaseManager:
             return False
         return found
 
+    def get_journal_purhased_on(self, _id):
+        found = self.get_record(_id)
+        if found is None:
+            return False
+        return found[5]
+
     def get_amount_journal_pages(self):
         return math.ceil(self.amount_journal_records / config.journal_offset)
 
@@ -256,7 +266,7 @@ class DatabaseManager:
 
 
     def get_all_of_product(self, _id):
-        from_catalog, from_journal = self.__get_product(_id), self.__get_record(_id)
+        from_catalog, from_journal = self.__get_product(_id), self.get_record(_id)
         if not from_catalog and not from_journal:
             return False
         return from_catalog, from_journal
@@ -276,7 +286,7 @@ class DatabaseManager:
             return found
         return False
 
-    def __get_record(self, _id) -> bool | list:
+    def get_record(self, _id) -> bool | list:
         """Возвращает запись о продукте из журнала учета, если продукта с указанным ID нет - вернет False"""
         self.cursor.execute(
             "SELECT * FROM `journal` WHERE `id` = ?",
