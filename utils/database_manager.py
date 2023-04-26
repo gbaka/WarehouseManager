@@ -136,7 +136,6 @@ class DatabaseManager:
             (amount, _id)
         )
 
-        self.amount_journal_records += 1
 
         # добавляем или изменяем запись в журнале учета
         purchase_price = int(is_exist[4])
@@ -157,6 +156,44 @@ class DatabaseManager:
             "INSERT INTO `journal` VALUES(?, ?, ?, ?, ?, ?)",
             (_id, name, 0, 0, amount, amount * purchase_price)
         )
+        self.amount_journal_records += 1
+        self.connection.commit()
+        return is_exist
+
+    def sell_product(self, _id, amount):
+        """None"""
+        is_exist = self.__get_product(_id)
+        amount = int(amount)
+        if not is_exist:
+            return 1
+        if amount > int(is_exist[2]):
+            return 2
+        # уменьшаем кол-во товара в каталоге
+        self.cursor.execute(
+            "UPDATE `goods` SET "
+            "`amount` = `amount` -  ? WHERE `id` = ?",
+            (amount, _id)
+        )
+
+        # добавляем или изменяем запись в журнале учета
+        sell_price = int(is_exist[3])
+        found = self.__get_record(_id)
+        if found:
+            self.cursor.execute(
+                "UPDATE `journal` SET "
+                "`amount_sales` = `amount_sales` + ?, "
+                "`sold_on` = `sold_on` + ? "
+                "WHERE `id` = ? ",
+                (amount, amount * sell_price, _id)
+            )
+            self.connection.commit()
+            return is_exist
+        name = is_exist[1]
+        self.cursor.execute(
+            "INSERT INTO `journal` VALUES(?, ?, ?, ?, ?, ?)",
+            (_id, name, amount, amount * sell_price, 0, 0)
+        )
+        self.amount_journal_records += 1
         self.connection.commit()
         return is_exist
 
