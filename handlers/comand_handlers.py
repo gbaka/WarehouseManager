@@ -57,7 +57,7 @@ def auth(message):
         chat_id=message.chat.id,
         text='❌ *Команда введена неверно.*\n\n'
              'Формат команды:\n'
-             '`/auth <key>`'
+             '`/auth <ключ>`'
     )
 
 
@@ -114,7 +114,7 @@ def add_product(message):
         chat_id=message.chat.id,
         text='❌ *Команда введена неверно.*\n\n'
              'Формат команды:\n'
-             '`/add <name> <amount> <sell> <purchase>`'
+             '`/add <name> <количество> <цена продажи> <цена закупки>`'
     )
 
 
@@ -154,7 +154,7 @@ def set_price_of_product(message):
         chat_id=message.chat.id,
         text='❌ *Команда введена неверно.*\n\n'
              f'Формат команды:\n'
-             f'`{command} <ID> <price>`'
+             f'`{command} <ID> <цена>`'
     )
 
 
@@ -186,8 +186,8 @@ def set_amount_of_product(message):
     BOT.send_message(
         chat_id=message.chat.id,
         text='❌ *Команда введена неверно.*\n\n'
-             'Формат команды:'
-             '`/seta <ID> <amount>`'
+             'Формат команды:\n'
+             '`/seta <ID> <количество>`'
     )
 
 
@@ -217,7 +217,7 @@ def del_product(message):
     BOT.send_message(
         chat_id=message.chat.id,
         text='❌ *Команда введена неверно.*\n\n'
-             'Формат команды:'
+             'Формат команды:\n'
              '`/del <ID>`'
     )
 
@@ -272,7 +272,7 @@ def show_product_info(message):
     BOT.send_message(
         chat_id=message.chat.id,
         text='❌ *Команда введена неверно.*\n\n'
-             'Формат команды:'
+             'Формат команды:\n'
              '`/product <ID>`'
     )
 
@@ -326,7 +326,7 @@ def show_catalog(message):
         chat_id=message.chat.id,
         text='❌ *Команда введена неверно*.\n\n'
              'Формат команды:\n'
-             '`/catalog <page=0>`'
+             '`/catalog <страница=1>`'
     )
 
 
@@ -366,7 +366,7 @@ def show_journal(message):
         chat_id=message.chat.id,
         text='❌ *Команда введена неверно*.\n\n'
              'Формат команды:\n'
-             '`/journal <page=1>`'
+             '`/journal <страница=1>`'
     )
 
 
@@ -401,7 +401,7 @@ def buy_product(message):
         chat_id=message.chat.id,
         text='❌ *Команда введена неверно*.\n\n'
              'Формат команды:\n'
-             '`/buy <id> <amount>`'
+             '`/buy <id> <количество>`'
     )
 
 
@@ -444,7 +444,7 @@ def sell_product(message):
         chat_id=message.chat.id,
         text='❌ *Команда введена неверно*.\n\n'
              'Формат команды:\n'
-             '`/sell <id> <amount>`'
+             '`/sell <id> <количество>`'
     )
 
 
@@ -493,7 +493,7 @@ def set_journal(message):
         )
         return
     command = message.text.split()[0]
-    val = "value" if command in ['/setso', '/setpo'] else "amount"
+    val = "значение" if command in ['/setso', '/setpo'] else "количество"
     BOT.send_message(
         chat_id=message.chat.id,
         text='❌ *Команда введена неверно.*\n\n'
