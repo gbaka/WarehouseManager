@@ -638,7 +638,7 @@ def handle_button_sell(message, _id):
                 sell_price = status[3]
                 BOT.send_message(
                     chat_id=message.chat.id,
-                    text=f'✅ *Вы успешно продали {amount} единиц\(ы\) товара "{status[1]}":*\n\n'
+                    text=f'✅ *Вы успешно продали {amount} единиц\(ы\) товара "{helpers.to_markdown_correct(status[1],2)}":*\n\n'
                          f'_ID товара:_  {status[0]}\n'
                          f'_Имя товара:_  "{helpers.to_markdown_correct(status[1], 2)}"\n'
                          f'_Стоимость продажи товара:_  {status[3]}\n'
@@ -662,7 +662,7 @@ def handle_button_buy(message, _id):
             purchase_price = status[4]
             BOT.send_message(
                 chat_id=message.chat.id,
-                text=f'✅ *Вы успешно закупили {amount} единиц товара "{status[1]}":*\n\n'
+                text=f'✅ *Вы успешно закупили {amount} единиц товара "{helpers.to_markdown_correct(status[1],2)}":*\n\n'
                      f'_ID товара:_  {status[0]}\n'
                      f'_Имя товара:_  "{helpers.to_markdown_correct(status[1],2)}"\n'
                      f'_Стоимость закупки товара:_  {status[4]}\n'
