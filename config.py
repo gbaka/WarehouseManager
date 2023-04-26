@@ -16,7 +16,7 @@ commands_access = {
     "auth":    0,
     "unauth":  0,
     "myrole":  0,
-    "journal": 0,
+    "journal": 1,
     "buy":     0,
     "sell":    0
 }

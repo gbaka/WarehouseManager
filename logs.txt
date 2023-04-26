@@ -1,2 +1,0 @@
-2023-04-26 04:21:09,046 INFO database is open
-2023-04-26 04:21:09,047 INFO bot is running

@@ -34,19 +34,22 @@ def create_catalog_page(catalog_page: list, page: int, goods_amount: int, for_ad
 
 
 def create_journal_page(journal_page: list, page: int, records_amount: int) -> str:
-    title = f'📔 *{page}-ая страница журнала учета:*\n'
-    info = f'_*всего записей в журнале: {records_amount}_\n\n'
+    title = f'📔 *{page}\-ая страница журнала учета:*\n'
+    info = f'_\*всего записей в журнале: {records_amount}_\n\n'
     text = ''
     for record in journal_page:
         text += f'_ID товара:_  {record[0]}\n'
         text += f'_Имя товара:_  "{record[1]}"\n'
-        text += f'_Количество продаж:_ {record[2]}\n'
-        text += f'_Количество закупок:_ {record[4]}\n'
-        text += f'_Доход от продаж:_ {record[3]}\n'
-        text += f'_Расход на закупки:_ {record[5]}\n'
-        text += f'_Прибыль:_ {int(record[3])-int(record[5])}\n'
+        text += f'_Количество продаж:_  {record[2]}\n'
+        text += f'_Количество закупок:_  {record[4]}\n'
+        text += f'_Доход от продаж:_  {record[3]}\n'
+        text += f'_Расход на закупки:_  {record[5]}\n'
+        profit = int(record[3])-int(record[5])
+        profit = '\-' + str(-profit) if profit < 0 else profit
+        text += f'_*Прибыль:*_  *{profit}*\n'
         text += '\n'
     return title + info + text
+
 
 
 # def create_page_keyboard(page: int, max_page: int):

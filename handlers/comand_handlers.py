@@ -305,9 +305,8 @@ def show_journal(message):
             BOT.send_message(
                 chat_id=message.chat.id,
                 reply_markup=helpers.create_flip_keyboard(page, DATABASE_MANAGER.get_amount_journal_pages(), 'journal'),
-                text=helpers.create_journal_page(
-                    status, page, DATABASE_MANAGER.get_amount_journal_records()
-                )
+                text=helpers.create_journal_page(status, page, DATABASE_MANAGER.get_amount_journal_records()),
+                parse_mode='MarkdownV2'
             )
             return
         if page == 1:
@@ -346,7 +345,7 @@ def buy_product(message):
                      f'_Имя товара:_  "{status[1]}"\n'
                      f'_Стоимость закупки товара:_  {status[4]}\n'
                      f'_Закуплено штук:_  {command[2]}\n'
-                     f'_*Расход на закупку:*_  {purchase_price * int(command[2])}\n',
+                     f'_*Расход на закупку:*_  *{purchase_price * int(command[2])}*\n',
                 parse_mode = 'MarkdownV2'
             )
             return
@@ -394,7 +393,7 @@ def sell_product(message):
                          f'_Имя товара:_  "{status[1]}"\n'
                          f'_Стоимость продажи товара:_  {status[3]}\n'
                          f'_Продано штук:_  {command[2]}\n'
-                         f'_*Доход от продажи:*_  {sell_price * int(command[2])}\n',
+                         f'_*Доход от продажи:*_  *{sell_price * int(command[2])}*\n',
                     parse_mode='MarkdownV2'
                 )
                 return
@@ -442,12 +441,13 @@ def keyboard_response(message):
 
 
 @BOT.callback_query_handler(
-    func=lambda call: ACCOUNT_MANAGER.check_access(call.from_user.id, config.commands_access['catalog'])
+    func=lambda call: True
 )
 def flip_page(call):
-    command = helpers.is_valid(call.data, r'catalog \d+')
-    if command:
-        to_page = int(command[1])
+    command = helpers.is_valid(call.data, r'[A-Za-z]+ \d+')
+    to_page = int(command[1])
+    user_id = call.from_user.id
+    if command[0] == 'catalog' and ACCOUNT_MANAGER.check_access(user_id, config.commands_access['catalog']):
         max_page = DATABASE_MANAGER.get_amount_catalog_pages()
         if 1 <= to_page <= max_page:
             page_record = DATABASE_MANAGER.get_catalog_page(to_page)
@@ -458,6 +458,20 @@ def flip_page(call):
                 text=helpers.create_catalog_page(
                     page_record, to_page, DATABASE_MANAGER.get_amount_goods(),
                     ACCOUNT_MANAGER.is_admin(call.from_user.id)
+                )
+            )
+    elif command[0] == 'journal' and ACCOUNT_MANAGER.check_access(user_id, config.commands_access['journal']):
+        max_page = DATABASE_MANAGER.get_amount_journal_pages()
+        if 1 <= to_page <= max_page:
+            page_record = DATABASE_MANAGER.get_journal_page(to_page)
+            BOT.edit_message_text(
+                chat_id=call.message.chat.id,
+                message_id=call.message.id,
+                reply_markup=helpers.create_flip_keyboard(to_page, max_page, 'journal'),
+                parse_mode="MarkdownV2",
+                text=helpers.create_journal_page(
+                    page_record,to_page,
+                    DATABASE_MANAGER.get_amount_journal_records()
                 )
             )
     BOT.answer_callback_query(callback_query_id=call.id)
