@@ -1,5 +1,6 @@
 import telebot
 import config
+import logging
 import handlers.helpers as helpers
 from utils.database_manager import DatabaseManager
 from utils.account_manager import AccountManager
@@ -20,6 +21,19 @@ def start(message):
         text="*🛠 Слава труду!*\nВыбирай кнопку, которая тебя интересует.",
         reply_markup=helpers.create_start_keyboard(),
     )
+
+
+@BOT.message_handler(
+    commands=['stop'],
+    func=lambda mes: ACCOUNT_MANAGER.check_access(mes.from_user.id, config.commands_access['stop'])
+)
+def stop_command(message):
+    logging.info("bot stopped")
+    BOT.send_message(
+        chat_id=message.chat.id,
+        text='*Бот отключен*.'
+    )
+    BOT.stop_polling()
 
 
 @BOT.message_handler(

@@ -24,6 +24,7 @@ commands_access = {
     "setj":    2,  # редактирование журнала
     "product": 2,
     "addpo":   2,
+    "stop":    2
 }
 
 info = {
